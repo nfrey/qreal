@@ -11,7 +11,7 @@ class MetaPlugin : public QObject, public qReal::EditorInterface
 	Q_OBJECT
 	Q_INTERFACES(qReal::EditorInterface)
 
-	public:
+public:
 
 	MetaPlugin();
 
@@ -33,7 +33,7 @@ class MetaPlugin : public QObject, public qReal::EditorInterface
 	virtual QStringList getUsedTypes(QString const &element) const;
 	virtual QList<QPair<QPair<QString,QString>,QPair<bool,QString> > > getPossibleEdges(QString const &element) const;
 
-	virtual int isNodeOrEdge(QString const &element) const;
+	virtual int isNodeOrEdge(QString const &element) const;//
 
 	virtual QIcon getIcon(SdfIconEngineV2Interface *engine) const;
 	virtual UML::ElementImpl* getGraphicalObject(QString const &diagram, QString const &element) const;
@@ -52,15 +52,19 @@ class MetaPlugin : public QObject, public qReal::EditorInterface
 
 	virtual QList<qReal::ListenerInterface*> listeners() const;
 
-	private:
-		QMap<QString, QIcon> iconMap;
-		QMap<QString, QString> mDiagramNameMap;
-		QMap<QString, QString> mDiagramNodeNameMap;
-		QMap<QString, QMap<QString, QString> > mPropertyTypes;
-		QMap<QString, QMap<QString, QString> > mPropertyDefault;
-		QMap<QString, QMap<QString, QString> > mElementsNameMap;
-
-		QMap<QString, QMap<QString, QString> > mElementsDescriptionMap;
-		QMap<QString, QMap<QString, QMap<QString, QString> > > mPropertiesDescriptionMap;
-		QMap<QString, QMap<QString, QString> > mElementMouseGesturesMap;
+private:
+	QMap<QString, QIcon> iconMap;
+	QMap<QString, QString> mDiagramNameMap;
+	QMap<QString, QString> mDiagramNodeNameMap;//
+	QMap<QString, QMap<QString, QString> > mPropertyTypes;
+	QMap<QString, QMap<QString, QString> > mPropertyDefault;
+	QMap<QString, QMap<QString, QString> > mElementsNameMap;
+	QMap<QString, QList<UML::ElementImpl> > mGraphicalObjects;
+	QMap<QString, QStringList> mElementContainedTypes;
+	QMap<QString, QStringList> mElementConnections;
+	QMap<QString, QStringList> mElementUsages;
+	QMap<QString, QMap<QString, QString> > mElementsDescriptionMap;
+	QMap<QString, QMap<QString, QMap<QString, QString> > > mPropertiesDescriptionMap;
+	QMap<QString, QMap<QString, QString> > mElementMouseGesturesMap;//
+	QMap<QString, QStringList> mEnums;
 };

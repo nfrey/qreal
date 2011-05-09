@@ -22,6 +22,7 @@ public:
 	~SdfRenderer();
 
 	bool load (const QString &filename);
+	bool load (const QDomElement *element);
 	void render(QPainter *painter, const QRectF &bounds);
 	void noScale();
 
@@ -48,7 +49,7 @@ private:
 	QFont font;
 	QFile log;
 	QTextStream logtext;
-	QDomDocument doc;
+	QDomElement mElement;
 
 	/** @brief is false if we don't need to scale according to absolute
   * coords, is useful for rendering icons. default is true
