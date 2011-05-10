@@ -68,9 +68,9 @@ private:
 	bool mMaximizesChildren;
 	bool mIsPin;
 	bool mIsHavePin;
-	QStringList mBonusContextMenuFields;
 	QString mStartArrowStyle;
 	QString mEndArrowStyle;
+	QStringList mBonusContextMenuFields;
 
 	int mPictureWidth;
 	int mPictureHeight;

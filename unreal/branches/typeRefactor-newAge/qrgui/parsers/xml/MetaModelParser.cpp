@@ -17,11 +17,6 @@ MetaModelParser::MetaModelParser()
 
 void MetaModelParser::parseFile(const QString &fileName)
 {
-	//QFileInfo directoryName(fileName);
-	//QString fileBaseName = directoryName.baseName();
-
-	//if (containsName(fileBaseName))
-	//	return;
 	mDocument = utils::xmlUtils::loadDocument(fileName);
 
 	fillDiagramNameMap();
@@ -41,15 +36,18 @@ void MetaModelParser::fillDiagramNameMap()
 void MetaModelParser::fillDiagramAttributes(QDomElement & diagram)
 {
 	QDomNodeList diagramAttributes = diagram.childNodes();
-
+	QString diagramNormalizedName = NameNormalizer::normalize(diagram.attribute("name"));
 	for (unsigned i = 0; i < diagramAttributes.length(); ++i)
 	{
 		QDomElement type = diagramAttributes.at(i).toElement();
 		if (type.tagName() == "nonGraphicTypes")
 			fillEnums(type);
 		if (type.tagName() == "graphicTypes")
-			fillGraphicElementType(type, NameNormalizer::normalize(diagram.attribute("name")));
+			fillGraphicElementType(type, diagramNormalizedName);
 	}
+	mGraphicalObjects.insert(diagramNormalizedName, mGraphicObjectsForElements);
+	mPropertiesDescriptionMap.insert(diagramNormalizedName, mPropertyDescriptionsForElements);
+	mElementsDescriptionMap.insert(diagramNormalizedName, mElementDescriptionsForElements);
 }
 
 void MetaModelParser::fillEnums(QDomElement &nonGraphicType)
@@ -103,7 +101,6 @@ void MetaModelParser::setEdgeAttributes(const QDomElement &edge, const QString &
 		if (tag.tagName() == "logic")
 			setEdgeConfigurations(tag, diagramName, elementName);
 	}
-	QMap<QString, UML::ElementImpl*> graphicObjects;
 	for (unsigned i = 0; i < edgeList.length(); ++i) {
 		QDomElement tag = edgeList.at(i).toElement();
 		if (tag.tagName() == "graphics")
@@ -123,10 +120,9 @@ void MetaModelParser::setEdgeAttributes(const QDomElement &edge, const QString &
 						mBonusContextMenuFields,
 						mStartArrowStyle,
 						mEndArrowStyle);
-			graphicObjects.insert(elementName, impl);
+			mGraphicObjectsForElements.insert(elementName, impl);
 			//add metaElementImpl element
 		}
-		mGraphicalObjects.insert(diagramName, graphicObjects);
 	}
 }
 
@@ -187,8 +183,7 @@ void MetaModelParser::fillNode(QDomElement &node, QString const &diagramName)
 	QString description = node.attribute("description");
 	if (!description.isEmpty())
 	{
-		//Fill mElementDescriptionMap
-		//mElementsDescriptionMap.insert(diagramName, new QMap<QString, QString>(normalizedName, description));
+		mElementDescriptionsForElements.insert(normalizedName, description);
 	}
 
 	setNodeAttributes(node, diagramName, normalizedName);
@@ -205,7 +200,6 @@ void MetaModelParser::setNodeAttributes(const QDomElement &node, const QString &
 			setNodeConfigurations(tag, diagramName, elementName);
 	}
 
-	QMap<QString, UML::ElementImpl*> graphicObjects;
 	for (unsigned i = 0; i < nodeList.length(); ++i)
 	{
 		QDomElement tag = nodeList.at(i).toElement();
@@ -225,9 +219,8 @@ void MetaModelParser::setNodeAttributes(const QDomElement &node, const QString &
 						mIsHavePin,
 						mBonusContextMenuFields,
 						"", "");
-			graphicObjects.insert(elementName, impl);
+			mGraphicObjectsForElements.insert(elementName, impl);
 		}
-		mGraphicalObjects.insert(diagramName, graphicObjects);
 	}
 }
 
@@ -332,6 +325,7 @@ void MetaModelParser::setProperties(QDomElement &properties, const QString &diag
 	}
 	mPropertyDefault.insert(elementName, defaultValues);
 	mPropertyTypes.insert(elementName, types);
+	mPropertyDescriptionsForElements.insert(elementName, descriptions);
 	//mPropertiesDescriptionMap.insert(diagramName,
 									 //new QMap<QString, QMap<QString, QString>
 									 //(elementName,

@@ -11,6 +11,7 @@
 #include "../../qrrepo/repoApi.h"
 #include "../umllib/uml_nodeelement.h"
 #include "../umllib/uml_edgeelement.h"
+#include "metaPlugin.h"
 
 using namespace qReal;
 
@@ -24,7 +25,6 @@ EditorManager::EditorManager(QObject *parent)
 	}
 
 	mPluginsDir.cd("plugins");
-
 	foreach (QString fileName, mPluginsDir.entryList(QDir::Files)) {
 		QPluginLoader *loader  = new QPluginLoader(mPluginsDir.absoluteFilePath(fileName));
 		mLoaders.insert(fileName, loader);
@@ -43,6 +43,16 @@ EditorManager::EditorManager(QObject *parent)
 			// QMessageBox::warning(0, "QReal Plugin", loader->errorString() );
 		}
 	}
+	mPluginsDir.cdUp();
+	mPluginsDir.cdUp();
+	mPluginsDir.cd("qrxml");
+	mPluginsDir.cd("metaEditor");
+	QString xmlPath = mPluginsDir.absolutePath() + "/meta_editor.xml";
+	MetaPlugin* metaPlugin = new MetaPlugin(xmlPath);
+	metaPlugin->initPlugin();
+	mPluginsLoaded += metaPlugin->id();
+	mPluginFileName.insert(metaPlugin->id(), xmlPath);
+	mPluginIface[metaPlugin->id()] = metaPlugin;
 }
 
 bool EditorManager::loadPlugin(const QString &pluginName)

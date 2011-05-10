@@ -13,7 +13,7 @@ class MetaPlugin : public QObject, public qReal::EditorInterface
 
 public:
 
-	MetaPlugin();
+	MetaPlugin(QString const &fileName);
 
 	virtual void initPlugin();
 //	virtual void initMouseGestureMap();
@@ -53,6 +53,7 @@ public:
 	virtual QList<qReal::ListenerInterface*> listeners() const;
 
 private:
+	QString const &mFileName;
 	QMap<QString, QIcon> iconMap;
 	QMap<QString, QString> mDiagramNameMap;
 	QMap<QString, QString> mDiagramNodeNameMap;//

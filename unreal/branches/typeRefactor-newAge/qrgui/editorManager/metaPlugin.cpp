@@ -1,10 +1,14 @@
 #include "metaPlugin.h"
 #include "../parsers/xml/MetaModelParser.cpp"
 
+MetaPlugin::MetaPlugin(QString const &fileName):
+	mFileName(fileName)
+{}
+
 void MetaPlugin::initPlugin()
 {
 	MetaModelParser parser = MetaModelParser();
-	parser.parseFile("");
+	parser.parseFile(mFileName);
 	mElementsNameMap = parser.getElementNameMap();
 	mDiagramNameMap = parser.getDiagramNameMap();
 	mElementsDescriptionMap = parser.getElementDescriptionMap();
@@ -66,7 +70,7 @@ QStringList MetaPlugin::getUsedTypes(QString const &element) const
 
 int MetaPlugin::isNodeOrEdge(QString const &element) const
 {
-	mIsNodeOrEdge[element];
+	return mIsNodeOrEdge[element];
 }
 
 QString MetaPlugin::getPropertyType(QString const &element, QString const &property) const

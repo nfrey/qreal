@@ -71,6 +71,9 @@ private:
 	QMap<QString, QStringList > mEnums;
 	QMap<QString, int> mIsNodeOrEdge;
 	QMap<QString, QString> mElementNames;
+	QMap<QString, UML::ElementImpl*> mGraphicObjectsForElements;
+	QMap<QString, QMap<QString, QString> > mPropertyDescriptionsForElements;
+	QMap<QString, QString> mElementDescriptionsForElements;
 
 
 	void fillDiagramNameMap();
