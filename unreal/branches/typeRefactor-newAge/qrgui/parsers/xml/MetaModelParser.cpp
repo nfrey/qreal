@@ -5,8 +5,8 @@
 #include <QtXml/QDomDocument>
 #include <QtCore/QProcess>
 
-#include "nameNormalizer.h"
-
+#include "../../../qrxc/nameNormalizer.h"
+#include "../../../utils/xmlUtils.h"
 
 using namespace qReal;
 using namespace parsers;
@@ -17,15 +17,12 @@ MetaModelParser::MetaModelParser()
 
 void MetaModelParser::parseFile(const QString &fileName)
 {
-	QFileInfo directoryName(fileName);
-	QString fileBaseName = directoryName.baseName();
+	//QFileInfo directoryName(fileName);
+	//QString fileBaseName = directoryName.baseName();
 
-	if (containsName(fileBaseName))
-		return;
+	//if (containsName(fileBaseName))
+	//	return;
 	mDocument = utils::xmlUtils::loadDocument(fileName);
-
-	Id const packageId = getPackageId();
-	initMetamodel(doc, fileName, packageId);
 
 	fillDiagramNameMap();
 }
@@ -72,7 +69,7 @@ void MetaModelParser::fillEnums(QDomElement &nonGraphicType)
 	}
 }
 
-void MetaModelParser::fillGraphicElementType(QDomElement &graphicType, QString &diagramName)
+void MetaModelParser::fillGraphicElementType(QDomElement &graphicType, QString const &diagramName)
 {
 	QDomNodeList graphicElements = graphicType.childNodes();
 
@@ -85,32 +82,119 @@ void MetaModelParser::fillGraphicElementType(QDomElement &graphicType, QString &
 			fillEdge(graphicElement, diagramName);
 
 	}
+	mElementsNameMap.insert(diagramName, mElementNames);
 }
 
-void MetaModelParser::fillEdge(QDomElement &edge, QString diagramName)
+void MetaModelParser::fillEdge(QDomElement &edge, QString const &diagramName)
 {
-	mIsNode = false;
-	mIsContainer = false;
+	QString normalizedName = NameNormalizer::normalize(getQualifiedName(diagramName, edge.attribute("name")));
+	mElementNames.insert(normalizedName, edge.attribute("displayedName"));
+	mIsNodeOrEdge.insert(normalizedName, -1);
+	setEdgeAttributes(edge, diagramName, normalizedName);
 }
 
-void MetaModelParser::fillNode(QDomElement &node, QString diagramName)
+void MetaModelParser::setEdgeAttributes(const QDomElement &edge, const QString &diagramName, const QString &elementName)
+{
+	QDomNodeList edgeList = edge.childNodes();
+
+	for (unsigned i = 0; i < edgeList.length(); ++i)
+	{
+		QDomElement tag = edgeList.at(i).toElement();
+		if (tag.tagName() == "logic")
+			setEdgeConfigurations(tag, diagramName, elementName);
+	}
+	QMap<QString, UML::ElementImpl*> graphicObjects;
+	for (unsigned i = 0; i < edgeList.length(); ++i) {
+		QDomElement tag = edgeList.at(i).toElement();
+		if (tag.tagName() == "graphics")
+		{
+			MetaElementImpl* impl = new MetaElementImpl(
+						tag,
+						false,
+						false,
+						false,
+						0,
+						0,
+						false,
+						false,
+						false,
+						false,
+						false,
+						mBonusContextMenuFields,
+						mStartArrowStyle,
+						mEndArrowStyle);
+			graphicObjects.insert(elementName, impl);
+			//add metaElementImpl element
+		}
+		mGraphicalObjects.insert(diagramName, graphicObjects);
+	}
+}
+
+void MetaModelParser::setEdgeConfigurations(const QDomElement &tag, const QString &diagramName, const QString &elementName)
+{
+	QDomNodeList edgeAttributes = tag.childNodes();
+
+	for (unsigned i = 0; i < edgeAttributes.length(); ++i) {
+		QDomElement attribute = edgeAttributes.at(i).toElement();
+		if (attribute.tagName() == "properties")
+			setProperties(attribute, diagramName, elementName);
+		else if (attribute.tagName() == "associations")
+			setAssociations(attribute);
+		//else if (attribute.tagName() == "possibleEdges")
+		//setPossibleEdges(attribute, edgeId);
+		else if (attribute.tagName() == "bonusContextMenuFields")
+		{
+			for (QDomElement childElement = attribute.firstChildElement("field");
+				 !childElement.isNull();
+				 childElement = childElement.nextSiblingElement())
+			{
+				mBonusContextMenuFields.append(childElement.attribute("name"));
+			}
+		}
+	}
+}
+
+void MetaModelParser::setAssociations(const QDomElement &element)
+{
+	QDomNodeList associations = element.childNodes();
+	QDomElement association = associations.at(0).toElement();
+
+	mStartArrowStyle = association.attribute("beginType");
+	mEndArrowStyle = association.attribute("endType");
+}
+
+void MetaModelParser::setPossibleEdges(const QDomElement &element, QString const &diagramName, QString const &elementName)
+{
+	QDomNodeList possibleEdges = element.childNodes();
+
+	for (unsigned i = 0; i < possibleEdges.length(); ++i) {
+		QDomElement possibleEdge = possibleEdges.at(i).toElement();
+		if (possibleEdge.tagName() == "possibleEdge")
+		{
+		}
+	}
+}
+
+void MetaModelParser::fillNode(QDomElement &node, QString const &diagramName)
 {
 	mIsNode = true;
 
-	QString normalizedName = NameNormalizer::normalize(qualifiedName(diagramName, node.attribute("name")));
-	mElementsNameMap.insert(diagramName, new QMap<QString, QString>(normalizedName, node.attribute("displayedName")));
+	QString normalizedName = NameNormalizer::normalize(getQualifiedName(diagramName, node.attribute("name")));
+	mElementNames.insert(normalizedName, node.attribute("displayedName"));
+	mIsNodeOrEdge.insert(normalizedName, 1);
 
 	//fill description map
 	QString description = node.attribute("description");
 	if (!description.isEmpty())
 	{
-		mElementsDescriptionMap.insert(diagramName, new QMap<QString, QString>(normalizedName, description));
+		//Fill mElementDescriptionMap
+		//mElementsDescriptionMap.insert(diagramName, new QMap<QString, QString>(normalizedName, description));
 	}
 
-	setNodeAttributes(node, nodeId);
+	setNodeAttributes(node, diagramName, normalizedName);
 }
 
-void MetaModelParser::setNodeAttributes(const QDomElement &node, const QString &elementName)
+void MetaModelParser::setNodeAttributes(const QDomElement &node, const QString &diagramName, const QString &elementName)
 {
 	QDomNodeList nodeList = node.childNodes();
 
@@ -118,45 +202,70 @@ void MetaModelParser::setNodeAttributes(const QDomElement &node, const QString &
 	{
 		QDomElement tag = nodeList.at(i).toElement();
 		if (tag.tagName() == "logic")
-			setNodeConfigurations(tag, elementName);
+			setNodeConfigurations(tag, diagramName, elementName);
+	}
+
+	QMap<QString, UML::ElementImpl*> graphicObjects;
+	for (unsigned i = 0; i < nodeList.length(); ++i)
+	{
+		QDomElement tag = nodeList.at(i).toElement();
 		if (tag.tagName() == "graphics")
 		{
-			//add MetaElementImpl to the Map
+			MetaElementImpl* impl = new MetaElementImpl(
+						tag,
+						true,
+						mIsContainer,
+						mIsSortingContainer,
+						mSizeOfForestalling,
+						mSizeOfChildrenForestalling,
+						mHasMovableChildren,
+						mMinimizesToChildren,
+						mMaximizesChildren,
+						mIsPin,
+						mIsHavePin,
+						mBonusContextMenuFields,
+						"", "");
+			graphicObjects.insert(elementName, impl);
 		}
+		mGraphicalObjects.insert(diagramName, graphicObjects);
 	}
 }
 
-void MetaModelParser::setNodeConfigurations(const QDomElement &tag, const QString &elementName)
+void MetaModelParser::setNodeConfigurations(const QDomElement &tag, const QString &diagramName, const QString &elementName)
 {
 	QDomNodeList nodeAttributes = tag.childNodes();
 
 	for (unsigned i = 0; i < nodeAttributes.length(); ++i) {
 		QDomElement attribute = nodeAttributes.at(i).toElement();
-		switch (attribute.tagName())
+		QString tagName = attribute.tagName();
+		if (tagName == "container")
 		{
-		case "container":
 			setContainers(attribute, elementName);
 			setTypedList(attribute, elementName, "contains", mElementContainedTypes);
-		case "connections":
-			setTypedList(attribute, elementName, "connection", mElementConnections);
-		case "usages":
-			setTypedList(attribute, elementName, "usage", mElementUsages);
-		case "properties":
-			setProperties(attribute, elementName);
 		}
-
-		if (attribute.tagName() == "generalizations")
-			setGeneralization(attribute, nodeId);
-		else if (attribute.tagName() == "pin")
-			setPin(nodeId);
-		else if (attribute.tagName() == "action")
-			setAction(nodeId);
-		else if (attribute.tagName() == "bonusContextMenuFields")
-			setFields(attribute, nodeId);
+		else if (tagName == "connections")
+			setTypedList(attribute, elementName, "connection", mElementConnections);
+		else if (tagName == "usages")
+			setTypedList(attribute, elementName, "usage", mElementUsages);
+		else if (tagName == "properties")
+			setProperties(attribute, diagramName, elementName);
+		else if (tagName == "pin")
+			mIsPin = true;
+		else if (tagName == "action")
+			mIsHavePin = true;
+		else if (tagName == "bonusContextMenuFields")
+		{
+			for (QDomElement childElement = attribute.firstChildElement("field");
+				 !childElement.isNull();
+				 childElement = childElement.nextSiblingElement())
+			{
+				mBonusContextMenuFields.append(childElement.attribute("name"));
+			}
+		}
 	}
 }
 
-void MetaModelParser::setContainers(const QDomElement &container,
+void MetaModelParser::setContainers(QDomElement &container,
 									const QString &elementName)
 {
 	if (container.childNodes().count() > 0)
@@ -171,29 +280,26 @@ void MetaModelParser::setContainers(const QDomElement &container,
 			 !childElement.isNull();
 			 childElement = childElement.nextSiblingElement())
 		{
-			switch (childElement.tagName())
-			{
-			case "sortContainer":
+			QString tagName = childElement.tagName();
+			if (tagName == "sortContainer")
 				mIsSortingContainer = true;
-			case "forestalling":
+			else if (tagName == "forestalling")
 				mSizeOfForestalling = childElement.attribute("size").toInt();
-			case "childrenForestalling":
+			else if (tagName == "childrenForestalling")
 				mSizeOfChildrenForestalling = childElement.attribute("size").toInt();
-			case "minimizeToChildren":
+			else if (tagName == "minimizeToChildren")
 				mMinimizesToChildren = true;
-			case "banChildrenMove":
+			else if (tagName == "banChildrenMove")
 				mHasMovableChildren = false;
-			case "maximizeChildren":
+			else if (tagName == "maximizeChildren")
 				mMaximizesChildren = true;
-
-			}
 		}
 	}
 }
 
 void MetaModelParser::setTypedList(QDomElement &node, const QString &elementName,
 								   const QString &tagName,
-								   QMap<QString, QMap<QString, QString> > map)
+								   QMap<QString, QStringList > map)
 {
 	QStringList res;
 	for (QDomElement childNode= node.firstChildElement(tagName);
@@ -206,7 +312,7 @@ void MetaModelParser::setTypedList(QDomElement &node, const QString &elementName
 	map.insert(elementName, res);
 }
 
-void MetaModelParser::setProperties(QDomElement &properties, const QString diagramName,
+void MetaModelParser::setProperties(QDomElement &properties, const QString &diagramName,
 									const QString &elementName)
 {
 	QMap<QString, QString> defaultValues;
@@ -226,28 +332,14 @@ void MetaModelParser::setProperties(QDomElement &properties, const QString diagr
 	}
 	mPropertyDefault.insert(elementName, defaultValues);
 	mPropertyTypes.insert(elementName, types);
-	mPropertiesDescriptionMap.insert(diagramName,
-									 new QMap<QString, QMap<QString, QString>
-									 (elementName,
-									  descriptions);
+	//mPropertiesDescriptionMap.insert(diagramName,
+									 //new QMap<QString, QMap<QString, QString>
+									 //(elementName,
+									 // descriptions);
+	//insert mPropertiesDescriptionMap
 }
 
-void MetaModelParser::setEdgeAttributes(const QDomElement &edge, const Id &edgeId)
-{
-	QDomNodeList edgeList = edge.childNodes();
-
-	for (unsigned i = 0; i < edgeList.length(); ++i) {
-		QDomElement tag = edgeList.at(i).toElement();
-		if (tag.tagName() == "logic")
-			setEdgeConfigurations(tag, edgeId);
-		if (tag.tagName() == "graphics")
-		{
-			//add metaElementImpl element
-		}
-	}
-}
-
-QString MetaModelParser::getQualifiedName(QString &context, QString &name)
+QString MetaModelParser::getQualifiedName(QString const &context, QString const &name)
 {
 	return context + "::" + name;
 }
@@ -297,7 +389,7 @@ QMap<QString, QMap<QString, QMap<QString, QString> > > MetaModelParser::getPrope
 	return mPropertiesDescriptionMap;
 }
 
-QMap<QString, QMap<QString, UML::ElementImpl> > MetaModelParser::getGraphicalObjects()
+QMap<QString, QMap<QString, UML::ElementImpl*> > MetaModelParser::getGraphicalObjects()
 {
 	return mGraphicalObjects;
 }
@@ -305,4 +397,9 @@ QMap<QString, QMap<QString, UML::ElementImpl> > MetaModelParser::getGraphicalObj
 QMap<QString, QStringList> MetaModelParser::getEnums()
 {
 	return mEnums;
+}
+
+QMap<QString, int> MetaModelParser::isNodeOrEdge()
+{
+	return mIsNodeOrEdge;
 }

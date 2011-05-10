@@ -2,9 +2,9 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMap>
 #include <QtGui/QIcon>
-#include <QPair>"
+#include <QPair>
 
-#include \"../../../qrgui/pluginInterface/editorInterface.h\"
+#include "../../../qrgui/pluginInterface/editorInterface.h"
 
 class MetaPlugin : public QObject, public qReal::EditorInterface
 {
@@ -16,11 +16,11 @@ public:
 	MetaPlugin();
 
 	virtual void initPlugin();
-	virtual void initMouseGestureMap();
-	virtual void initNameMap();
-	virtual void initPropertyMap();
-	virtual void initPropertyDefaultsMap();
-	virtual void initDescriptionMap();
+//	virtual void initMouseGestureMap();
+//	virtual void initNameMap();
+//	virtual void initPropertyMap();
+//	virtual void initPropertyDefaultsMap();
+//	virtual void initDescriptionMap();
 
 	virtual QString id() const { return "meta"; }
 
@@ -31,9 +31,9 @@ public:
 	virtual QStringList getTypesContainedBy(QString const &element) const;
 	virtual QStringList getConnectedTypes(QString const &element) const;
 	virtual QStringList getUsedTypes(QString const &element) const;
-	virtual QList<QPair<QPair<QString,QString>,QPair<bool,QString> > > getPossibleEdges(QString const &element) const;
+	virtual QList<QPair<QPair<QString,QString>,QPair<bool,QString> > > getPossibleEdges(QString const &element) const;//
 
-	virtual int isNodeOrEdge(QString const &element) const;//
+	virtual int isNodeOrEdge(QString const &element) const;
 
 	virtual QIcon getIcon(SdfIconEngineV2Interface *engine) const;
 	virtual UML::ElementImpl* getGraphicalObject(QString const &diagram, QString const &element) const;
@@ -59,7 +59,7 @@ private:
 	QMap<QString, QMap<QString, QString> > mPropertyTypes;
 	QMap<QString, QMap<QString, QString> > mPropertyDefault;
 	QMap<QString, QMap<QString, QString> > mElementsNameMap;
-	QMap<QString, QList<UML::ElementImpl> > mGraphicalObjects;
+	QMap<QString, QMap<QString, UML::ElementImpl*> > mGraphicalObjects;
 	QMap<QString, QStringList> mElementContainedTypes;
 	QMap<QString, QStringList> mElementConnections;
 	QMap<QString, QStringList> mElementUsages;
@@ -67,4 +67,5 @@ private:
 	QMap<QString, QMap<QString, QMap<QString, QString> > > mPropertiesDescriptionMap;
 	QMap<QString, QMap<QString, QString> > mElementMouseGesturesMap;//
 	QMap<QString, QStringList> mEnums;
+	QMap<QString, int> mIsNodeOrEdge;
 };

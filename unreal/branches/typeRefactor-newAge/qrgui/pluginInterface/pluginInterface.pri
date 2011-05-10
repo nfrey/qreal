@@ -5,5 +5,4 @@ HEADERS += \
 	pluginInterface/elementTitleHelpers.h \
 	pluginInterface/sdfRendererInterface.h \
 	pluginInterface/listenerInterface.h \
-	pluginInterface/listenerApiInterface.h \
-
+	pluginInterface/listenerApiInterface.h

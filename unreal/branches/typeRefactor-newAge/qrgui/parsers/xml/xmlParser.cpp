@@ -33,6 +33,18 @@ void XmlParser::parseFile(const QString &fileName)
 		return;
 	QDomDocument const doc = utils::xmlUtils::loadDocument(fileName);
 
+	Id const packageId = getPackageId();
+	initMetamodel(doc, fileName, packageId);
+
+	QDomNodeList const listeners = doc.elementsByTagName("listener");
+	int listenerPositionY = 100;
+	for (unsigned i = 0; i < listeners.length(); ++i) {
+		QDomElement listener = listeners.at(i).toElement();
+		Id type = initListener("(Listener)", listener.attribute("class", ""), listener.attribute("file", ""));
+		mApi.setProperty(type, "position", QPointF(0,listenerPositionY));
+		listenerPositionY += 90;
+	}
+
 	QDomNodeList const diagrams = doc.elementsByTagName("diagram");
 
 	mElementsColumn =  ceil(sqrt(static_cast<qreal>(diagrams.length())));
@@ -43,6 +55,20 @@ void XmlParser::parseFile(const QString &fileName)
 					diagram.attribute("displayedName", "Unknown Diagram"));
 	}
 	clear();
+}
+
+void XmlParser::clear()
+{
+	mElementsColumn = 0;
+	mElementCurrentColumn = 0;
+	mMoveWidth = 180;
+	mMoveHeight = 100;
+	mCurrentWidth = 0;
+	mCurrentHeight = 0;
+	mParentPositionX = 280;
+	mElements.clear();
+	mParents.clear();
+	mContainers.clear();
 }
 
 QStringList XmlParser::getIncludeList(const QString &fileName)
@@ -63,6 +89,92 @@ QStringList XmlParser::getIncludeList(const QString &fileName)
 	return includeFilesList;
 }
 
+void XmlParser::loadIncludeList(const QString &fileName)
+{
+	QStringList includeList = getIncludeList(fileName);
+	if (includeList.isEmpty())
+		return;
+	if (QMessageBox::question(NULL, QObject::tr("loading.."),"Do you want to load connected metamodels?", QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
+		foreach (QString const &include, includeList) {
+			if (!containsName(include))
+				parseFile(include);
+		}
+	}
+}
+
+bool XmlParser::containsName(const QString &name)
+{
+	IdList idList = mApi.children(ROOT_ID);
+	foreach (Id const &id, idList) {
+		if (mApi.name(id) == name)
+			return true;
+	}
+	return false;
+}
+
+Id XmlParser::getPackageId()
+{
+	IdList const children = mApi.children(ROOT_ID);
+	foreach (Id id, children) {
+		if (mApi.type(id).element() == "PackageDiagram")
+			return id;
+	}
+	NewType const type("Meta_editor", "MetaEditor", "PackageDiagram");
+	Id const packageId(QUuid::createUuid().toString());
+	setStandartConfigurations(packageId, ROOT_ID, type, "Package", "Package");
+	return packageId;
+}
+
+void XmlParser::initMetamodel(const QDomDocument &document, const QString &directoryName, const Id &id)
+{
+	QFileInfo fileName(directoryName);
+	QString fileBaseName = fileName.baseName();
+
+	NewType metamodelType = NewType("Meta_editor", "MetaEditor", "MetamodelDiagram");
+	Id metamodelId = Id(QUuid::createUuid().toString());
+
+	QDomNodeList const includeList = document.elementsByTagName("include");
+	QString includeListString = "";
+
+	for (unsigned i = 0; i < includeList.length(); ++i) {
+		QDomElement include = includeList.at(i).toElement();
+		includeListString += include.text() + ", ";
+	}
+	setStandartConfigurations(metamodelId, id, metamodelType, "Empty_" + fileBaseName, "");
+	mApi.setProperty(metamodelId, "include", includeListString);
+	mApi.setProperty(metamodelId, "name of the directory", fileBaseName);
+
+	metamodelType = NewType("Meta_editor", "MetaEditor", "MetamodelDiagram");
+	mMetamodel = Id(QUuid::createUuid().toString());
+	setStandartConfigurations(mMetamodel, ROOT_ID, metamodelType, fileBaseName, "");
+	mApi.setProperty(mMetamodel, "include", includeListString);
+	mApi.setProperty(mMetamodel, "name of the directory", fileBaseName);
+	mApi.connect(metamodelId, mMetamodel);
+}
+
+Id XmlParser::initListener(const QString &name, const QString &className, const QString &fileName)
+{
+	NewType listenerType = NewType("Meta_editor", "MetaEditor", "Listener");
+	Id listenerId = Id(QUuid::createUuid().toString());
+
+	setStandartConfigurations(listenerId, mMetamodel, listenerType, name, name);
+	mApi.setProperty(listenerId, "class", className);
+	mApi.setProperty(listenerId, "file", fileName);
+	return listenerId;
+}
+
+void XmlParser::initDiagram(const QDomElement &diagram, const Id &parent,
+							const QString &name, const QString &displayedName)
+{
+	NewType diagramType = NewType("Meta_editor", "MetaEditor", "MetaEditorDiagramNode");
+	Id diagramId = Id(QUuid::createUuid().toString());
+	setStandartConfigurations(diagramId, parent, diagramType, name, displayedName);
+	mApi.setProperty(diagramId, "nodeName", diagram.attribute("nodeName", ""));
+
+	createDiagramAttributes(diagram, diagramId);
+
+	setElementPosition(diagramId);
+}
 
 void XmlParser::createDiagramAttributes(const QDomElement &diagram, const Id &diagramId)
 {

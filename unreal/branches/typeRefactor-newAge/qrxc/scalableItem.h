@@ -5,7 +5,8 @@
 
 class ScalableItem
 {
-protected:
+public:
 	static ScalableCoordinate initCoordinate(QString const &coordinate, int maxValue);
 	virtual ~ScalableItem() {};
+protected:	
 };

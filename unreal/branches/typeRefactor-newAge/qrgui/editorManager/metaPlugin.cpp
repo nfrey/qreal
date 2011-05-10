@@ -3,7 +3,7 @@
 
 void MetaPlugin::initPlugin()
 {
-	MetaModelParser parser = new MetaModelParser();
+	MetaModelParser parser = MetaModelParser();
 	parser.parseFile("");
 	mElementsNameMap = parser.getElementNameMap();
 	mDiagramNameMap = parser.getDiagramNameMap();
@@ -16,6 +16,17 @@ void MetaPlugin::initPlugin()
 	mElementUsages = parser.getElementUsages();
 	mGraphicalObjects = parser.getGraphicalObjects();
 	mEnums = parser.getEnums();
+	mIsNodeOrEdge = parser.isNodeOrEdge();
+}
+
+QList<QPair<QPair<QString,QString>,QPair<bool,QString> > > MetaPlugin::getPossibleEdges(const QString &element) const
+{
+	return 	QList<QPair<QPair<QString,QString>,QPair<bool,QString> > >();
+}
+
+QList<qReal::ListenerInterface*> MetaPlugin::listeners() const
+{
+	return QList<qReal::ListenerInterface*>();
 }
 
 QStringList MetaPlugin::diagrams() const
@@ -51,6 +62,11 @@ QStringList MetaPlugin::getConnectedTypes(QString const &element) const
 QStringList MetaPlugin::getUsedTypes(QString const &element) const
 {
 	return mElementUsages[element];
+}
+
+int MetaPlugin::isNodeOrEdge(QString const &element) const
+{
+	mIsNodeOrEdge[element];
 }
 
 QString MetaPlugin::getPropertyType(QString const &element, QString const &property) const

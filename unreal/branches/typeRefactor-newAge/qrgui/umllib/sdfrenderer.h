@@ -22,7 +22,7 @@ public:
 	~SdfRenderer();
 
 	bool load (const QString &filename);
-	bool load (const QDomElement *element);
+	bool load (const QDomElement &element);
 	void render(QPainter *painter, const QRectF &bounds);
 	void noScale();
 

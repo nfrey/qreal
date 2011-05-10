@@ -2,12 +2,11 @@
 
 #include <QtCore/QString>
 #include <QtXml/QDomElement>
-#include "../../../qrgui/pluginInterface/editorInterface.h\"
+#include "../../../qrgui/pluginInterface/editorInterface.h"
 #include "../../../qrgui/pluginInterface/elementRepoInterface.h"
 #include "../../../qrgui/pluginInterface/elementTitleHelpers.h"
 
 using namespace UML;
-namespace parsers {
 
 class MetaElementImpl: public UML::ElementImpl
 {
@@ -23,7 +22,7 @@ public:
 					bool maximizesChildren,
 					bool isPin,
 					bool isHavePin,
-					bool isbonusContextMenuFieldsEmpty,
+					QStringList bonusContextMenuFields,
 					QString startArrowStyle,
 					QString endArrowStyle);
 	void init(ElementTitleFactoryInterface &, QList<ElementTitleInterface*> &) {}
@@ -53,8 +52,12 @@ public:
 	QStringList bonusContextMenuFields();
 
 private:
-	void generateEdgeStyle(QString const &styleString, QPainter *painter);
+	void generateEdgeStyle(QString styleString, QPainter *painter) const;
+	void fillTitles(QDomElement &labels, QList<ElementTitleInterface*> &titles, ElementTitleFactoryInterface &factory);
+	void fillLinePorts(QDomElement &ports, QList<StatLine> &linePorts);
+	void fillPointPorts(QDomElement &ports, QList<StatPoint> &pointPorts);
 
+	QDomElement mElement;
 	bool mIsNode;
 	bool mIsContainer;
 	bool mIsSortingContainer;
@@ -65,18 +68,20 @@ private:
 	bool mMaximizesChildren;
 	bool mIsPin;
 	bool mIsHavePin;
-	bool mIsBonusContextMenuFieldsEmpty;
+	QStringList mBonusContextMenuFields;
 	QString mStartArrowStyle;
 	QString mEndArrowStyle;
 
+	int mPictureWidth;
+	int mPictureHeight;
+
 	SdfRendererInterface *mRenderer;
-	QDomElement *mElement;
-	QDomElement *mPictureElement;
-	QDomElement *mPortsElement;
-	QDomElement *mLabelElement;
-	QDomElement *mLineStyleElement;
-	QList<ElementTitleInterface> mTitles;
+	QDomElement mPictureElement;
+	QDomElement mPortsElement;
+	QDomElement mLabelElement;
+	QDomElement mLineStyleElement;
+	QList<ElementTitleInterface*> mTitles;
 	QString mTextBinded;
 	QString mCenter;
 };
-}
+

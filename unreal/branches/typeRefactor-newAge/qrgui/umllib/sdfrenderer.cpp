@@ -30,22 +30,12 @@ SdfRenderer::~SdfRenderer()
 {
 }
 
-bool SdfRenderer::load(const QDomElement *element)
-{
-	mElement = element;
-	first_size_x = mElement.attribute("sizex").toInt();
-	first_size_y = mElement.attribute("sizey").toInt();
-
-	return true;
-}
-
 bool SdfRenderer::load(const QString &filename)
 {
 	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
-
-	QDomDocument doc = new QDomDocument();
+	QDomDocument doc;
 	if (!doc.setContent(&file))
 	{
 		file.close();
@@ -54,6 +44,15 @@ bool SdfRenderer::load(const QString &filename)
 	file.close();
 
 	return this->load(doc.documentElement());
+}
+
+bool SdfRenderer::load(const QDomElement &element)
+{
+	mElement = element;
+	first_size_x = mElement.attribute("sizex").toInt();
+	first_size_y = mElement.attribute("sizey").toInt();
+
+	return true;
 }
 
 void SdfRenderer::render(QPainter *painter, const QRectF &bounds)
