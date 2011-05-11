@@ -168,6 +168,7 @@ void XmlCompiler::generatePluginHeader()
 		<< "\tvirtual int isNodeOrEdge(QString const &element) const; \n"
 		<< "\n"
 		<< "\tvirtual QIcon getIcon(SdfIconEngineV2Interface *engine) const;\n"
+		<< "\tvirtual QIcon getIcon(SdfIconEngineV2Interface *engine, QString const &diagramName, QString const &elementName) const;\n"
 		<< "\tvirtual UML::ElementImpl* getGraphicalObject(QString const &diagram, QString const &element) const;\n"
 		<< "\tvirtual QString getPropertyType(QString const &element, QString const &property) const;\n"
 		<< "\tvirtual QString getPropertyDefaultValue(QString const &element, QString const &property) const;\n"
@@ -354,6 +355,10 @@ void XmlCompiler::generateNameMappingsRequests(OutFile &out)
 		<< "}\n\n"
 
 		<< "QIcon " << mPluginName << "Plugin::getIcon(SdfIconEngineV2Interface *engine) const\n{\n"
+		<< "\treturn QIcon(engine);\n"
+		<< "}\n\n"
+
+		<< "QIcon " << mPluginName << "Plugin::getIcon(SdfIconEngineV2Interface *engine, QString const &diagramName, QString const &elementName) const\n{\n"
 		<< "\treturn QIcon(engine);\n"
 		<< "}\n\n"
 

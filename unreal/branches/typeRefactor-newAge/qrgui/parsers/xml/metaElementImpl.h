@@ -25,6 +25,7 @@ public:
 					QStringList bonusContextMenuFields,
 					QString startArrowStyle,
 					QString endArrowStyle);
+	MetaElementImpl(MetaElementImpl const * const impl);
 	void init(ElementTitleFactoryInterface &, QList<ElementTitleInterface*> &) {}
 
 	void init(QRectF &contents, QList<StatPoint> &pointPorts,

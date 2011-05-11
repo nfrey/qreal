@@ -46,8 +46,8 @@ EditorManager::EditorManager(QObject *parent)
 	mPluginsDir.cdUp();
 	mPluginsDir.cdUp();
 	mPluginsDir.cd("qrxml");
-	mPluginsDir.cd("metaEditor");
-	QString xmlPath = mPluginsDir.absolutePath() + "/meta_editor.xml";
+	mPluginsDir.cd("testEditor");
+	QString xmlPath = mPluginsDir.absolutePath() + "/test_metamodel.xml";
 	MetaPlugin* metaPlugin = new MetaPlugin(xmlPath);
 	metaPlugin->initPlugin();
 	mPluginsLoaded += metaPlugin->id();
@@ -190,10 +190,14 @@ QString EditorManager::mouseGesture(const NewType &type) const
 
 QIcon EditorManager::icon(const NewType &type) const
 {
+	//TODO: remove ha
 	Q_ASSERT(mPluginsLoaded.contains(type.editor()));
 	SdfIconEngineV2 *engine = new SdfIconEngineV2(":/generated/shapes/" + type.element() + "Class.sdf");
+	if (mPluginIface[type.editor()]->id() != "meta")
+		return mPluginIface[type.editor()]->getIcon(engine, "", "");
+	else
 	// QIcon will take ownership of engine, no need for us to delete
-	return mPluginIface[type.editor()]->getIcon(engine);
+	return mPluginIface[type.editor()]->getIcon(engine, type.diagram(), type.element());
 }
 
 UML::Element* EditorManager::graphicalObject(const NewType &type) const

@@ -4,7 +4,9 @@
 #include <QtGui/QIcon>
 #include <QPair>
 
-#include "../../../qrgui/pluginInterface/editorInterface.h"
+#include "../../pluginInterface/editorInterface.h"
+#include "../../parsers/xml/metaElementImpl.h"
+#include "../../umllib/sdfRenderer.h"
 
 class MetaPlugin : public QObject, public qReal::EditorInterface
 {
@@ -36,6 +38,7 @@ public:
 	virtual int isNodeOrEdge(QString const &element) const;
 
 	virtual QIcon getIcon(SdfIconEngineV2Interface *engine) const;
+	virtual QIcon getIcon(SdfIconEngineV2Interface *engine, QString const &diagramName, QString const &elementName) const;
 	virtual UML::ElementImpl* getGraphicalObject(QString const &diagram, QString const &element) const;
 	virtual QString getPropertyType(QString const &element, QString const &property) const;
 	virtual QString getPropertyDefaultValue(QString const &element, QString const &property) const;
@@ -60,7 +63,7 @@ private:
 	QMap<QString, QMap<QString, QString> > mPropertyTypes;
 	QMap<QString, QMap<QString, QString> > mPropertyDefault;
 	QMap<QString, QMap<QString, QString> > mElementsNameMap;
-	QMap<QString, QMap<QString, UML::ElementImpl*> > mGraphicalObjects;
+	QMap<QString, QMap<QString, MetaElementImpl*> > mGraphicalObjects;
 	QMap<QString, QStringList> mElementContainedTypes;
 	QMap<QString, QStringList> mElementConnections;
 	QMap<QString, QStringList> mElementUsages;
@@ -69,4 +72,5 @@ private:
 	QMap<QString, QMap<QString, QString> > mElementMouseGesturesMap;//
 	QMap<QString, QStringList> mEnums;
 	QMap<QString, int> mIsNodeOrEdge;
+	QMap<QString, QMap<QString, QDomElement> > mIconMap;
 };

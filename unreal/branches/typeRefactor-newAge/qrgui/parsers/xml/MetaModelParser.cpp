@@ -12,6 +12,10 @@ using namespace qReal;
 using namespace parsers;
 
 MetaModelParser::MetaModelParser()
+	: mIsNode(false), mIsContainer(false), mIsSortingContainer(false),
+	  mSizeOfForestalling(0), mSizeOfChildrenForestalling(0),
+	  mHasMovableChildren(false), mMinimizesToChildren(false),
+	  mMaximizesChildren(false), mIsPin(false), mIsHavePin(false)
 {
 }
 
@@ -46,6 +50,7 @@ void MetaModelParser::fillDiagramAttributes(QDomElement & diagram)
 			fillGraphicElementType(type, diagramNormalizedName);
 	}
 	mGraphicalObjects.insert(diagramNormalizedName, mGraphicObjectsForElements);
+	mIconMap.insert(diagramNormalizedName, mIconMapForElements);
 	mPropertiesDescriptionMap.insert(diagramNormalizedName, mPropertyDescriptionsForElements);
 	mElementsDescriptionMap.insert(diagramNormalizedName, mElementDescriptionsForElements);
 }
@@ -121,6 +126,7 @@ void MetaModelParser::setEdgeAttributes(const QDomElement &edge, const QString &
 						mStartArrowStyle,
 						mEndArrowStyle);
 			mGraphicObjectsForElements.insert(elementName, impl);
+			mIconMapForElements.insert(elementName, tag.firstChildElement("picture"));
 			//add metaElementImpl element
 		}
 	}
@@ -220,6 +226,7 @@ void MetaModelParser::setNodeAttributes(const QDomElement &node, const QString &
 						mBonusContextMenuFields,
 						"", "");
 			mGraphicObjectsForElements.insert(elementName, impl);
+			mIconMapForElements.insert(elementName, tag.firstChildElement("picture"));
 		}
 	}
 }
@@ -327,9 +334,9 @@ void MetaModelParser::setProperties(QDomElement &properties, const QString &diag
 	mPropertyTypes.insert(elementName, types);
 	mPropertyDescriptionsForElements.insert(elementName, descriptions);
 	//mPropertiesDescriptionMap.insert(diagramName,
-									 //new QMap<QString, QMap<QString, QString>
-									 //(elementName,
-									 // descriptions);
+	//new QMap<QString, QMap<QString, QString>
+	//(elementName,
+	// descriptions);
 	//insert mPropertiesDescriptionMap
 }
 
@@ -383,7 +390,7 @@ QMap<QString, QMap<QString, QMap<QString, QString> > > MetaModelParser::getPrope
 	return mPropertiesDescriptionMap;
 }
 
-QMap<QString, QMap<QString, UML::ElementImpl*> > MetaModelParser::getGraphicalObjects()
+QMap<QString, QMap<QString, MetaElementImpl*> > MetaModelParser::getGraphicalObjects()
 {
 	return mGraphicalObjects;
 }
@@ -396,4 +403,9 @@ QMap<QString, QStringList> MetaModelParser::getEnums()
 QMap<QString, int> MetaModelParser::isNodeOrEdge()
 {
 	return mIsNodeOrEdge;
+}
+
+QMap<QString, QMap<QString, QDomElement> > MetaModelParser::getIconMap()
+{
+	return mIconMap;
 }

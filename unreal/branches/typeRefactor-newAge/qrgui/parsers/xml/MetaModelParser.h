@@ -33,11 +33,12 @@ public:
 	QMap<QString, QMap<QString, QString> > getElementDescriptionMap();
 	QMap<QString, QMap<QString, QString> > getPropertyTypes();
 	QMap<QString, QMap<QString, QString> > getPropertyDefaultValues();
-	QMap<QString, QMap<QString, UML::ElementImpl*> > getGraphicalObjects();
+	QMap<QString, QMap<QString, MetaElementImpl*> > getGraphicalObjects();
 	QMap<QString, QStringList > getElementContainedTypes();
 	QMap<QString, QStringList > getElementConnections();
 	QMap<QString, QStringList > getElementUsages();
 	QMap<QString, QMap<QString, QMap<QString, QString> > > getPropertyDescriptionMap();
+	QMap<QString, QMap<QString, QDomElement> > getIconMap();
 	QMap<QString, QStringList > getEnums();
 	QMap<QString, int> isNodeOrEdge();
 
@@ -64,14 +65,16 @@ private:
 	QMap<QString, QMap<QString, QString> > mPropertyDefault;
 	QMap<QString, QMap<QString, QMap<QString, QString> > > mPropertiesDescriptionMap;
 	QMap<QString, QMap<QString, QString> > mElementMouseGesturesMap;
-	QMap<QString, QMap<QString, UML::ElementImpl*> > mGraphicalObjects;
+	QMap<QString, QMap<QString, MetaElementImpl*> > mGraphicalObjects;
+	QMap<QString, QMap<QString, QDomElement> > mIconMap;
 	QMap<QString, QStringList > mElementContainedTypes;
 	QMap<QString, QStringList > mElementConnections;
 	QMap<QString, QStringList > mElementUsages;
 	QMap<QString, QStringList > mEnums;
 	QMap<QString, int> mIsNodeOrEdge;
 	QMap<QString, QString> mElementNames;
-	QMap<QString, UML::ElementImpl*> mGraphicObjectsForElements;
+	QMap<QString, QDomElement> mIconMapForElements;
+	QMap<QString, MetaElementImpl*> mGraphicObjectsForElements;
 	QMap<QString, QMap<QString, QString> > mPropertyDescriptionsForElements;
 	QMap<QString, QString> mElementDescriptionsForElements;
 

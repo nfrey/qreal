@@ -21,6 +21,7 @@ void MetaPlugin::initPlugin()
 	mGraphicalObjects = parser.getGraphicalObjects();
 	mEnums = parser.getEnums();
 	mIsNodeOrEdge = parser.isNodeOrEdge();
+	mIconMap = parser.getIconMap();
 }
 
 QList<QPair<QPair<QString,QString>,QPair<bool,QString> > > MetaPlugin::getPossibleEdges(const QString &element) const
@@ -45,7 +46,7 @@ QStringList MetaPlugin::elements(const QString &diagram) const
 
 UML::ElementImpl* MetaPlugin::getGraphicalObject(QString const &diagram, QString const &element) const
 {
-	return mGraphicalObjects[diagram][element];
+	return new MetaElementImpl(mGraphicalObjects[diagram][element]);
 }
 
 QStringList MetaPlugin::getPropertiesWithDefaultValues(QString const &element) const
@@ -98,9 +99,17 @@ QIcon MetaPlugin::getIcon(SdfIconEngineV2Interface *engine) const
 	return QIcon(engine);
 }
 
+QIcon MetaPlugin::getIcon(SdfIconEngineV2Interface *engine, QString const &diagramName, QString const &elementName) const
+{
+	if (diagramName.isEmpty() || elementName.isEmpty())
+		return QIcon(engine);
+	SdfIconEngineV2* eng = new SdfIconEngineV2(mIconMap[diagramName][elementName]);
+	return QIcon(eng);
+}
+
 QString MetaPlugin::editorName() const
 {
-	return "\"meta Editor\"";
+	return "\"ololo Editor\"";
 }
 
 QString MetaPlugin::diagramName(QString const &diagram) const
