@@ -205,7 +205,7 @@ QIcon EditorManager::icon(const NewType &type) const
 	//TODO: remove ha
 	Q_ASSERT(mPluginsLoaded.contains(type.editor()));
 	SdfIconEngineV2 *engine = new SdfIconEngineV2(":/generated/shapes/" + type.element() + "Class.sdf");
-	if (mPluginIface[type.editor()]->id() != "meta")
+	if (!mPluginIface[type.editor()]->isQuickMetaModelingMode())
 		return mPluginIface[type.editor()]->getIcon(engine, "", "");
 	else
 		// QIcon will take ownership of engine, no need for us to delete

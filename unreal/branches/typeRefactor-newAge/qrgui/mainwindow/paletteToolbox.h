@@ -7,6 +7,7 @@
 #include "../kernel/NewType.h"
 #include "../editorManager/metaPlugin.h"
 #include "../editorManager/editorManager.h"
+#include "../../qrxc/nameNormalizer.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -36,6 +37,8 @@ public:
 	QVector<QString> getTabNames();
 private:
 	EditorManager *mEditorManager;
+	NewType mChildElementType;
+	void createElement(QString const &elementName);//, ElementImpl* impl);
 
 public slots:
 	void setActiveEditor(int const editorIndex);

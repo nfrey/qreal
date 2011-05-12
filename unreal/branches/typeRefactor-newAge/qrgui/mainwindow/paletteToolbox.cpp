@@ -157,16 +157,20 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 
 	Q_ASSERT(child->type().typeSize() == 3); // it should be element type
 
-	if (event->button() == Qt::RightButton)
+	if (mEditorManager->getQuickMetamodelingPlugin()->id() == child->type().editor())
 	{
-		QMenu *menu = new QMenu(atMouse);
-		QAction *newElementAction = menu->addAction("Create new element");
-		QAction *copyElementAction = menu->addAction("Create element copy");
-		connect(newElementAction, SIGNAL(triggered()), SLOT(createNewElement()));
-		connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
+		if (event->button() == Qt::RightButton)
+		{
+			QMenu *menu = new QMenu(atMouse);
+			QAction *newElementAction = menu->addAction("Create new element");
+			QAction *copyElementAction = menu->addAction("Create element copy");
+			mChildElementType = child->type();
+			connect(newElementAction, SIGNAL(triggered()), SLOT(createNewElement()));
+			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
 
-		QPoint cursorPos = QCursor::pos();
-		menu->exec(cursorPos);
+			QPoint cursorPos = QCursor::pos();
+			menu->exec(cursorPos);
+		}
 	}
 	// new element's ID is being generated here
 	// may this epic event should take place in some more appropriate place
@@ -203,9 +207,21 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 
 void PaletteToolbox::createNewElement()
 {
-	MetaPlugin * metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
+	createElement("bla");
+}
 
-	metaPlugin->addElement("TestDiagram", "bla", "bla");
+void PaletteToolbox::createElementCopy()
+{
+	createElement(mChildElementType.element() + "Copy");
+}
+
+void PaletteToolbox::createElement(const QString &elementName)//, ElementImpl *impl)
+{
+	QString normalizedName = NameNormalizer::normalize(elementName);
+	MetaPlugin * metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
+	ElementImpl* impl = metaPlugin->getGraphicalObject(mChildElementType.diagram(), mChildElementType.element());
+	QDomElement elemForIcon = metaPlugin->getDomElementForIcon(mChildElementType.diagram(), mChildElementType.element());
+	metaPlugin->addElement(mChildElementType.diagram(), elementName, elementName, impl, elemForIcon);
 	foreach (NewType const editor, mEditorManager->editors())
 	{
 		if (editor.editor() == metaPlugin->id())
@@ -214,7 +230,7 @@ void PaletteToolbox::createNewElement()
 			{
 				foreach (NewType const element, mEditorManager->elements(diagram))
 				{
-					if (element.element() == "Bla")
+					if (element.element() == normalizedName)
 						this->addItemType(element, mEditorManager->friendlyName(element), mEditorManager->description(element), mEditorManager->icon(element));
 				}
 			}
@@ -231,7 +247,3 @@ void PaletteToolbox::createNewElement()
 	setActiveEditor(i);
 }
 
-void PaletteToolbox::createElementCopy()
-{
-
-}

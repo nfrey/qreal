@@ -49,6 +49,11 @@ UML::ElementImpl* MetaPlugin::getGraphicalObject(QString const &diagram, QString
 	return new MetaElementImpl(mGraphicalObjects[diagram][element]);
 }
 
+QDomElement MetaPlugin::getDomElementForIcon(QString const &diagram, QString const &element) const
+{
+	return mIconMap[diagram][element];
+}
+
 QStringList MetaPlugin::getPropertiesWithDefaultValues(QString const &element) const
 {
 	return mPropertyDefault[element].keys();
@@ -142,17 +147,17 @@ QString MetaPlugin::elementMouseGesture(QString const &diagram, QString const &e
 	return mElementMouseGesturesMap[diagram][element];
 }
 
-void MetaPlugin::addElement(const QString &diagramName, const QString &element, const QString &elementDisplayName)
+void MetaPlugin::addElement(const QString &diagramName, const QString &element, const QString &elementDisplayName,
+							ElementImpl* impl, QDomElement elementForIcon)
 {
 	QString normalizedName = NameNormalizer::normalize(getQualifiedName(diagramName, element));
 	if (mElementsNameMap[diagramName].contains(normalizedName))
-		mElementsNameMap[diagramName][normalizedName] = elementDisplayName;
+		mElementsNameMap[diagramName].insert(normalizedName + "Copy", elementDisplayName + "Copy");
 	else
-	{
-		QMap<QString, QString> map;
-		map.insert(normalizedName, elementDisplayName);
 		mElementsNameMap[diagramName].insert(normalizedName, elementDisplayName);
-	}
+
+	mGraphicalObjects[diagramName].insert(normalizedName, dynamic_cast<MetaElementImpl*>(impl));
+	mIconMap[diagramName].insert(normalizedName, elementForIcon);
 }
 
 QString MetaPlugin::getQualifiedName(QString const &context, QString const &name) const

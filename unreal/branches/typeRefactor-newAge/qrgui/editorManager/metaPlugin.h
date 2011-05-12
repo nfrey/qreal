@@ -40,6 +40,7 @@ public:
 	virtual QIcon getIcon(SdfIconEngineV2Interface *engine) const;
 	virtual QIcon getIcon(SdfIconEngineV2Interface *engine, QString const &diagramName, QString const &elementName) const;
 	virtual UML::ElementImpl* getGraphicalObject(QString const &diagram, QString const &element) const;
+	virtual QDomElement getDomElementForIcon(QString const &diagram, QString const &element) const;
 	virtual QString getPropertyType(QString const &element, QString const &property) const;
 	virtual QString getPropertyDefaultValue(QString const &element, QString const &property) const;
 	virtual QStringList getPropertyNames(QString const &diagram, QString const &element) const;
@@ -55,7 +56,7 @@ public:
 
 	virtual QList<qReal::ListenerInterface*> listeners() const;
 
-	void addElement(QString const &diagramName, QString const &element, QString const &elementDisplayName);
+	void addElement(QString const &diagramName, QString const &element, QString const &elementDisplayName, ElementImpl* impl, QDomElement elementForIcon);
 private:
 	QString const &mFileName;
 	QMap<QString, QIcon> iconMap;
