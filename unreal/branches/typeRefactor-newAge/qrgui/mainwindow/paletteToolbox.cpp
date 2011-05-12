@@ -4,6 +4,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QComboBox>
 #include <QtGui/QScrollArea>
+#include <QMenu>
 
 #include "paletteToolbox.h"
 #include "../kernel/definitions.h"
@@ -62,6 +63,11 @@ PaletteToolbox::~PaletteToolbox()
 
 	for (int i = 0; i < mTabs.count(); i++)
 		delete mTabs[i];
+}
+
+void PaletteToolbox::setEditorManager(EditorManager *manager)
+{
+	mEditorManager = manager;
 }
 
 void PaletteToolbox::setActiveEditor(int const comboIndex)
@@ -151,6 +157,17 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 
 	Q_ASSERT(child->type().typeSize() == 3); // it should be element type
 
+	if (event->button() == Qt::RightButton)
+	{
+		QMenu *menu = new QMenu(atMouse);
+		QAction *newElementAction = menu->addAction("Create new element");
+		QAction *copyElementAction = menu->addAction("Create element copy");
+		connect(newElementAction, SIGNAL(triggered()), SLOT(createNewElement()));
+		connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
+
+		QPoint cursorPos = QCursor::pos();
+		menu->exec(cursorPos);
+	}
 	// new element's ID is being generated here
 	// may this epic event should take place in some more appropriate place
 
@@ -182,4 +199,39 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 		child->close();
 	else
 		child->show();
+}
+
+void PaletteToolbox::createNewElement()
+{
+	MetaPlugin * metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
+
+	metaPlugin->addElement("TestDiagram", "bla", "bla");
+	foreach (NewType const editor, mEditorManager->editors())
+	{
+		if (editor.editor() == metaPlugin->id())
+		{
+			foreach (NewType const diagram, mEditorManager->diagrams(editor))
+			{
+				foreach (NewType const element, mEditorManager->elements(diagram))
+				{
+					if (element.element() == "Bla")
+						this->addItemType(element, mEditorManager->friendlyName(element), mEditorManager->description(element), mEditorManager->icon(element));
+				}
+			}
+
+		}
+	}
+	connect(mComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setActiveEditor(int)));
+	int i = 0;
+	for (i = 0; i < mEditorManager->editors().count(); i++)
+	{
+		if (mEditorManager->editors().at(i).editor() == metaPlugin->id())
+			break;
+	}
+	setActiveEditor(i);
+}
+
+void PaletteToolbox::createElementCopy()
+{
+
 }

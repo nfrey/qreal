@@ -142,3 +142,20 @@ QString MetaPlugin::elementMouseGesture(QString const &diagram, QString const &e
 	return mElementMouseGesturesMap[diagram][element];
 }
 
+void MetaPlugin::addElement(const QString &diagramName, const QString &element, const QString &elementDisplayName)
+{
+	QString normalizedName = NameNormalizer::normalize(getQualifiedName(diagramName, element));
+	if (mElementsNameMap[diagramName].contains(normalizedName))
+		mElementsNameMap[diagramName][normalizedName] = elementDisplayName;
+	else
+	{
+		QMap<QString, QString> map;
+		map.insert(normalizedName, elementDisplayName);
+		mElementsNameMap[diagramName].insert(normalizedName, elementDisplayName);
+	}
+}
+
+QString MetaPlugin::getQualifiedName(QString const &context, QString const &name) const
+{
+	return context + "::" + name;
+}

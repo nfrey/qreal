@@ -5,6 +5,8 @@
 #include <QtGui/QIcon>
 
 #include "../kernel/NewType.h"
+#include "../editorManager/metaPlugin.h"
+#include "../editorManager/editorManager.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -28,19 +30,23 @@ public:
 	void addItemType(NewType const &type, QString const &name, QString const &description, QIcon const &icon);
 	void initDone();
 	void deleteDiagramType(NewType const &type);
-
+	void setEditorManager(EditorManager *manager);
 	QComboBox* getComboBox();
 
 	QVector<QString> getTabNames();
+private:
+	EditorManager *mEditorManager;
 
 public slots:
 	void setActiveEditor(int const editorIndex);
+	void createNewElement();
+	void createElementCopy();
 
 private:
 	class DraggableElement : public QWidget {
 	public:
 		DraggableElement(NewType const &type, QString const &name, QString const &description,
-				QIcon const &icon, QWidget *parent = NULL);
+						 QIcon const &icon, QWidget *parent = NULL);
 
 		QIcon icon() const
 		{

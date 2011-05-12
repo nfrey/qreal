@@ -281,6 +281,8 @@ void MainWindow::loadPlugins()
 			}
 		}
 	}
+
+	mUi->paletteToolbox->setEditorManager(&mEditorManager);
 	mUi->paletteToolbox->initDone();
 }
 

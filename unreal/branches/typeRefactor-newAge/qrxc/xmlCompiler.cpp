@@ -155,6 +155,7 @@ void XmlCompiler::generatePluginHeader()
 		<< "\tvirtual void initDescriptionMap();\n"
 		<< "\n"
 		<< "\tvirtual QString id() const { return \"" << mPluginName << "\"; }\n"
+		<< "\tvirtual bool isQuickMetaModelingMode() const { return false; }\n"
 		<< "\n"
 		<< "\tvirtual QStringList diagrams() const;\n"
 		<< "\tvirtual QStringList elements(QString const &diagram) const;\n"

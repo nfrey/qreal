@@ -25,7 +25,7 @@ public:
 //	virtual void initDescriptionMap();
 
 	virtual QString id() const { return "meta"; }
-
+	virtual bool isQuickMetaModelingMode() const { return true; }
 	virtual QStringList diagrams() const;
 	virtual QStringList elements(QString const &diagram) const;
 	virtual QStringList getPropertiesWithDefaultValues(QString const &element) const;
@@ -55,6 +55,7 @@ public:
 
 	virtual QList<qReal::ListenerInterface*> listeners() const;
 
+	void addElement(QString const &diagramName, QString const &element, QString const &elementDisplayName);
 private:
 	QString const &mFileName;
 	QMap<QString, QIcon> iconMap;
@@ -73,4 +74,6 @@ private:
 	QMap<QString, QStringList> mEnums;
 	QMap<QString, int> mIsNodeOrEdge;
 	QMap<QString, QMap<QString, QDomElement> > mIconMap;
+
+	QString getQualifiedName(QString const &context, QString const &name) const;
 };

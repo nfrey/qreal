@@ -30,7 +30,6 @@ public:
 	TypeList elementsOnDiagram(NewType const &diagramNode) const;
 	bool loadPlugin(QString const &pluginName);
 	bool unloadPlugin(QString const &pluginName);
-
 	QString mouseGesture(NewType const &type) const;
 	QString friendlyName(NewType const &type) const;
 	QString description(NewType const &type) const;
@@ -54,7 +53,7 @@ public:
 	virtual QStringList getPropertiesWithDefaultValues(NewType const &type) const;
 
 	TypeList checkNeededPlugins(qrRepo::LogicalRepoApi const &logicalApi,
-			qrRepo::GraphicalRepoApi const &graphicalApi) const;
+								qrRepo::GraphicalRepoApi const &graphicalApi) const;
 	bool hasElement(NewType const &element) const;
 
 	NewType findElementByType(QString const &type) const;
@@ -63,6 +62,7 @@ public:
 	EditorInterface* getEditorInterface(QString editor) const;
 
 	bool isDiagramNode(NewType const &id) const;
+	EditorInterface* getQuickMetamodelingPlugin() const;
 private:
 	QStringList mPluginsLoaded;
 	QMap<QString, QString> mPluginFileName;
@@ -74,7 +74,7 @@ private:
 
 	const NewType mRoot;
 	void checkNeededPluginsRecursive(qrRepo::GraphicalRepoApi const *graphApi,
-			qrRepo::LogicalRepoApi const &api, Id const &id, TypeList &result) const;
+									 qrRepo::LogicalRepoApi const &api, Id const &id, TypeList &result) const;
 };
 
 }

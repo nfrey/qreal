@@ -55,6 +55,16 @@ EditorManager::EditorManager(QObject *parent)
 	mPluginIface[metaPlugin->id()] = metaPlugin;
 }
 
+EditorInterface* EditorManager::getQuickMetamodelingPlugin() const
+{
+	foreach (QString key, mPluginIface.keys())
+	{
+		if (mPluginIface[key]->isQuickMetaModelingMode())
+			return mPluginIface[key];
+	}
+	return new MetaPlugin("");
+}
+
 bool EditorManager::loadPlugin(const QString &pluginName)
 {
 	QPluginLoader *loader = new QPluginLoader(mPluginsDir.absoluteFilePath(pluginName));
@@ -173,6 +183,8 @@ QString EditorManager::description(const NewType &type) const
 
 QString EditorManager::propertyDescription(const NewType &type, const QString &propertyName) const
 {
+	if (type.editor().isEmpty() && type.diagram().isEmpty() && type.element().isEmpty())
+		return "";
 	Q_ASSERT(mPluginsLoaded.contains(type.editor()));
 
 	if (type.typeSize() != 4)
@@ -196,8 +208,8 @@ QIcon EditorManager::icon(const NewType &type) const
 	if (mPluginIface[type.editor()]->id() != "meta")
 		return mPluginIface[type.editor()]->getIcon(engine, "", "");
 	else
-	// QIcon will take ownership of engine, no need for us to delete
-	return mPluginIface[type.editor()]->getIcon(engine, type.diagram(), type.element());
+		// QIcon will take ownership of engine, no need for us to delete
+		return mPluginIface[type.editor()]->getIcon(engine, type.diagram(), type.element());
 }
 
 UML::Element* EditorManager::graphicalObject(const NewType &type) const

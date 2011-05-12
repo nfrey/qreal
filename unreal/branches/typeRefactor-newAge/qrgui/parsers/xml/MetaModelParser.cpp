@@ -14,7 +14,7 @@ using namespace parsers;
 MetaModelParser::MetaModelParser()
 	: mIsNode(false), mIsContainer(false), mIsSortingContainer(false),
 	  mSizeOfForestalling(0), mSizeOfChildrenForestalling(0),
-	  mHasMovableChildren(false), mMinimizesToChildren(false),
+	  mHasMovableChildren(true), mMinimizesToChildren(false),
 	  mMaximizesChildren(false), mIsPin(false), mIsHavePin(false)
 {
 }
