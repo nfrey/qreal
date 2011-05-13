@@ -165,7 +165,7 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			QAction *newElementAction = menu->addAction("Create new element");
 			QAction *copyElementAction = menu->addAction("Create element copy");
 			mChildElementType = child->type();
-			connect(newElementAction, SIGNAL(triggered()), SLOT(createNewElement()));
+			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
 
 			QPoint cursorPos = QCursor::pos();
@@ -205,9 +205,17 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 		child->show();
 }
 
+void PaletteToolbox::openCreateNewElementDialog()
+{
+	mDialog = new CreateNewElementDialog(this->parentWidget());
+	mDialog->show();
+	connect(mDialog, SIGNAL(accepted()), SLOT(createNewElement()));
+}
+
 void PaletteToolbox::createNewElement()
 {
-	createElement("bla");
+	mDialog->close();
+	createElement(mDialog->getElementName());//, mDialog->getElementDisplayedName());
 }
 
 void PaletteToolbox::createElementCopy()
@@ -217,6 +225,7 @@ void PaletteToolbox::createElementCopy()
 
 void PaletteToolbox::createElement(const QString &elementName)//, ElementImpl *impl)
 {
+
 	QString normalizedName = NameNormalizer::normalize(elementName);
 	MetaPlugin * metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
 	ElementImpl* impl = metaPlugin->getGraphicalObject(mChildElementType.diagram(), mChildElementType.element());

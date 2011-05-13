@@ -8,6 +8,7 @@
 #include "../editorManager/metaPlugin.h"
 #include "../editorManager/editorManager.h"
 #include "../../qrxc/nameNormalizer.h"
+#include "../dialogs/createNewElementDialog.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -39,11 +40,13 @@ private:
 	EditorManager *mEditorManager;
 	NewType mChildElementType;
 	void createElement(QString const &elementName);//, ElementImpl* impl);
+	CreateNewElementDialog* mDialog;
 
 public slots:
 	void setActiveEditor(int const editorIndex);
-	void createNewElement();
+	void openCreateNewElementDialog();
 	void createElementCopy();
+	void createNewElement();
 
 private:
 	class DraggableElement : public QWidget {
