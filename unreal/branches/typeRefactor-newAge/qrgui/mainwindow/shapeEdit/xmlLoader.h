@@ -13,6 +13,7 @@ public:
 	XmlLoader(Scene *scene);
 	void readString(const QString &text);
 	void readFile(const QString &fileName);
+	void readDomDocument(QDomDocument const &document);
 
 private:
 	QDomDocument mDocument;

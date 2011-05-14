@@ -42,6 +42,12 @@ void XmlLoader::readFile(const QString &fileName)
 	readDocument();
 }
 
+void XmlLoader::readDomDocument(QDomDocument const &document)
+{
+	mDocument = document;
+	readDocument();
+}
+
 void XmlLoader::readDocument()
 {
 	QDomNodeList const graphics = mDocument.elementsByTagName("graphics");

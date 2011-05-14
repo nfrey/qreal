@@ -19,6 +19,8 @@ public:
 	ShapeEdit(QPersistentModelIndex const &index, int const &role);
 	View* getView();
 	void load(const QString &text);
+	void open(QDomDocument const &document);
+	QDomElement getPictureElement();
 	~ShapeEdit();
 signals:
 	void shapeSaved(QString const &shape, QPersistentModelIndex const &index, int const &role);

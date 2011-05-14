@@ -57,6 +57,7 @@ public:
 	virtual QList<qReal::ListenerInterface*> listeners() const;
 
 	void addElement(QString const &diagramName, QString const &element, QString const &elementDisplayName, ElementImpl* impl, QDomElement elementForIcon);
+	void changeElement(QString const &diagramName, QString const &element, QString const &elementDisplayName, ElementImpl* impl, QDomElement elementForIcon);
 private:
 	QString const &mFileName;
 	QMap<QString, QIcon> iconMap;

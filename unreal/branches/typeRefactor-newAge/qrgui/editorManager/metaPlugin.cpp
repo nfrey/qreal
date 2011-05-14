@@ -160,6 +160,15 @@ void MetaPlugin::addElement(const QString &diagramName, const QString &element, 
 	mIconMap[diagramName].insert(normalizedName, elementForIcon);
 }
 
+void MetaPlugin::changeElement(const QString &diagramName, const QString &element, const QString &elementDisplayName,
+							   ElementImpl* impl, QDomElement elementForIcon)
+{
+	QString normalizedName = NameNormalizer::normalize(getQualifiedName(diagramName, element));
+	mElementsNameMap[diagramName][normalizedName] = elementDisplayName;
+	mGraphicalObjects[diagramName][normalizedName] = dynamic_cast<MetaElementImpl*>(impl);
+	mIconMap[diagramName][normalizedName] = elementForIcon;
+}
+
 QString MetaPlugin::getQualifiedName(QString const &context, QString const &name) const
 {
 	return context + "::" + name;

@@ -11,6 +11,7 @@
 #include "../dialogs/createNewElementDialog.h"
 #include "../umllib/elementTitle.h"
 #include "../editorManager/metamodelChangeManager.h"
+#include "shapeEdit.h"
 
 
 using namespace UML;
@@ -46,12 +47,15 @@ private:
 	CreateNewElementDialog* mDialog;
 	MetaPlugin* mMetaPlugin;
 	MetamodelChangeManager* mMetamodelChangeManager;
+	ShapeEdit* mShapeEdit;
 
 public slots:
 	void setActiveEditor(int const editorIndex);
 	void openCreateNewElementDialog();
 	void createElementCopy();
 	void createNewElement();
+	void openShapeEditor();
+	void changeElementShape();
 private:
 	class DraggableElement : public QWidget {
 	public:

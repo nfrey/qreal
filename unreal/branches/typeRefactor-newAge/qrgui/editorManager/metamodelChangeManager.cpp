@@ -61,6 +61,37 @@ ItemForAdd* MetamodelChangeManager::createNewElement(QString const &elementName)
 	return createElement(elementName, impl, graphicTag.firstChildElement("picture"));//, mDialog->getElementDisplayedName());
 }
 
+int MetamodelChangeManager::changeExistedElement(const QDomElement &element)
+{
+	QDomElement graphicTag = element;
+	MetaElementImpl* impl = new MetaElementImpl(graphicTag,
+												true, true, false, 0, 0, true,
+												true, true, false, false,
+												QStringList(), "", "");
+	SdfRenderer* portRenderer = new SdfRenderer();
+	SdfRenderer* renderer = new SdfRenderer();
+	ElementTitleFactory factory;
+	QList<ElementTitleInterface*> titles;
+	QRectF rect = QRectF(0, 0, 100, 100);
+	QList<StatPoint> points;
+	QList<StatLine> lines;
+	impl->init(rect, points, lines, factory, titles, renderer, portRenderer);
+	return changeElement(mChildElementType.element(), impl, graphicTag.firstChildElement("picture"));
+}
+
+int MetamodelChangeManager::changeElement(const QString &elementName, ElementImpl *impl, QDomElement elementForIcon)
+{
+	mMetaPlugin->changeElement(mChildElementType.diagram(), elementName, elementName, impl, elementForIcon);
+
+	int i = 0;
+	for (i = 0; i < mEditorManager->editors().count(); i++)
+	{
+		if (mEditorManager->editors().at(i).editor() == mMetaPlugin->id())
+			break;
+	}
+	return i;
+}
+
 ItemForAdd* MetamodelChangeManager::createElement(const QString &elementName, ElementImpl *impl, QDomElement elementForIcon)
 {
 	ItemForAdd* item;

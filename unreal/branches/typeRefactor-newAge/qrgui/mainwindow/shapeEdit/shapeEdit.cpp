@@ -259,6 +259,17 @@ void ShapeEdit::open()
 	loader.readFile(fileName);
 }
 
+QDomElement ShapeEdit::getPictureElement()
+{
+	return mDocument.firstChildElement("graphics");
+}
+
+void ShapeEdit::open(QDomDocument const &document)
+{
+	XmlLoader loader(mScene);
+	loader.readDomDocument(document);
+}
+
 void ShapeEdit::load(const QString &text)
 {
 	if (text.isEmpty())

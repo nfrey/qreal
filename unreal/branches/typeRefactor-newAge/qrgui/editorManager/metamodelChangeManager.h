@@ -33,9 +33,11 @@ public:
 	MetamodelChangeManager(NewType childElementType, EditorManager * editorManager);
 	ItemForAdd* createNewElement(QString const &elementName);
 	ItemForAdd* createCopyElement();
+	int changeExistedElement(QDomElement const &element);
 private:
 	ItemForAdd* createElement(QString const &elementName, ElementImpl* impl, QDomElement elementForIcon);
 	QDomElement createGraphicalObjectForNewElement();
+	int changeElement(QString const &elementName, ElementImpl* impl, QDomElement elementForIcon);
 
 	NewType mChildElementType;
 	MetaPlugin* mMetaPlugin;

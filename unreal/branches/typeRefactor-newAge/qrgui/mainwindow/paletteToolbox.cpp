@@ -166,9 +166,11 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			QMenu *menu = new QMenu(atMouse);
 			QAction *newElementAction = menu->addAction("Create new element");
 			QAction *copyElementAction = menu->addAction("Create element copy");
+			QAction *changeElementShape = menu->addAction("Change element shape");
 			mChildElementType = child->type();
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
+			connect(changeElementShape, SIGNAL(triggered()), SLOT(changeElementShape()));
 
 			QPoint cursorPos = QCursor::pos();
 			menu->exec(cursorPos);
@@ -207,6 +209,32 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 		else
 			child->show();
 	}
+}
+
+void PaletteToolbox::openShapeEditor()
+{
+	mShapeEdit = new ShapeEdit();
+	mShapeEdit->show();
+	QDomDocument doc;
+	QDomElement graphicTag = doc.createElement("graphics");
+	QDomElement elem = mMetaPlugin->getDomElementForIcon(mChildElementType.diagram(), mChildElementType.element());
+	graphicTag.appendChild(elem);
+	doc.appendChild(graphicTag);
+	mShapeEdit->open(doc);
+	connect(mShapeEdit, SIGNAL(saveToXmlSignal()),SLOT(changeElementShape()));
+}
+
+void PaletteToolbox::changeElementShape()
+{
+	QDomElement elem = mShapeEdit->getPictureElement();
+	QFile file("D://blabl.txt");
+		QTextStream stream(&file);
+		file.open(QIODevice::ReadWrite);
+		//elem.save(stream, 0);
+		elem.save(stream, 0);
+		file.close();
+	int i = mMetamodelChangeManager->changeExistedElement(elem);
+	setActiveEditor(i);
 }
 
 void PaletteToolbox::openCreateNewElementDialog()
