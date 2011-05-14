@@ -26,6 +26,7 @@ public:
 					QString startArrowStyle,
 					QString endArrowStyle);
 	MetaElementImpl(MetaElementImpl const * const impl);
+	MetaElementImpl(QDomElement const &element, MetaElementImpl const * const impl);
 	void init(ElementTitleFactoryInterface &, QList<ElementTitleInterface*> &) {}
 
 	void init(QRectF &contents, QList<StatPoint> &pointPorts,

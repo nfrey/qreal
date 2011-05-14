@@ -63,11 +63,10 @@ ItemForAdd* MetamodelChangeManager::createNewElement(QString const &elementName)
 
 int MetamodelChangeManager::changeExistedElement(const QDomElement &element)
 {
+	MetaElementImpl* oldimpl = dynamic_cast<MetaElementImpl*>
+			(mMetaPlugin->getGraphicalObject(mChildElementType.diagram(), mChildElementType.element()));
 	QDomElement graphicTag = element;
-	MetaElementImpl* impl = new MetaElementImpl(graphicTag,
-												true, true, false, 0, 0, true,
-												true, true, false, false,
-												QStringList(), "", "");
+	MetaElementImpl* impl = new MetaElementImpl(graphicTag, oldimpl);
 	SdfRenderer* portRenderer = new SdfRenderer();
 	SdfRenderer* renderer = new SdfRenderer();
 	ElementTitleFactory factory;

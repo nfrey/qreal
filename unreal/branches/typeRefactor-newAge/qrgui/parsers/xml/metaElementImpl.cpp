@@ -48,6 +48,24 @@ MetaElementImpl::MetaElementImpl(MetaElementImpl const * const impl)
 	mBonusContextMenuFields = impl->mBonusContextMenuFields;
 }
 
+MetaElementImpl::MetaElementImpl(QDomElement const &element, MetaElementImpl const * const impl)
+{
+	mElement = element;
+	mIsNode = impl->mIsNode;
+	mIsContainer = impl->mIsContainer;
+	mIsSortingContainer = impl->mIsSortingContainer;
+	mSizeOfForestalling = impl->mSizeOfForestalling;
+	mSizeOfChildrenForestalling = impl->mSizeOfChildrenForestalling;
+	mHasMovableChildren = impl->mHasMovableChildren;
+	mMinimizesToChildren = impl->mMinimizesToChildren;
+	mMaximizesChildren = impl->mMaximizesChildren;
+	mIsPin = impl->mIsPin;
+	mIsHavePin = impl->mIsPin;
+	mStartArrowStyle = impl->mStartArrowStyle;
+	mEndArrowStyle = impl->mEndArrowStyle;
+	mBonusContextMenuFields = impl->mBonusContextMenuFields;
+}
+
 void MetaElementImpl::init(QRectF &contents, QList<StatPoint> &pointPorts,
 						   QList<StatLine> &linePorts, ElementTitleFactoryInterface &factory,
 						   QList<ElementTitleInterface*> &titles, SdfRendererInterface *renderer,
