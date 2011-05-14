@@ -25,6 +25,7 @@ public:
 signals:
 	void shapeSaved(QString const &shape, QPersistentModelIndex const &index, int const &role);
 	void saveSignal();
+	void saveElementSignal();
 	void saveToXmlSignal();
 	void openSignal();
 

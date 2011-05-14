@@ -109,6 +109,7 @@ void PaletteToolbox::addItemType(NewType const &type, QString const &name, QStri
 	tab->layout()->addWidget(element);
 }
 
+
 void PaletteToolbox::deleteDiagramType(const NewType &type)
 {
 	if (mCategories.contains(type)) {
@@ -170,7 +171,7 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			mChildElementType = child->type();
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
-			connect(changeElementShape, SIGNAL(triggered()), SLOT(changeElementShape()));
+			connect(changeElementShape, SIGNAL(triggered()), SLOT(openShapeEditor()));
 
 			QPoint cursorPos = QCursor::pos();
 			menu->exec(cursorPos);
@@ -214,6 +215,7 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 void PaletteToolbox::openShapeEditor()
 {
 	mShapeEdit = new ShapeEdit();
+	connect(mShapeEdit, SIGNAL(saveElementSignal()),SLOT(changeElementShape()));
 	mShapeEdit->show();
 	QDomDocument doc;
 	QDomElement graphicTag = doc.createElement("graphics");
@@ -221,18 +223,11 @@ void PaletteToolbox::openShapeEditor()
 	graphicTag.appendChild(elem);
 	doc.appendChild(graphicTag);
 	mShapeEdit->open(doc);
-	connect(mShapeEdit, SIGNAL(saveToXmlSignal()),SLOT(changeElementShape()));
 }
 
 void PaletteToolbox::changeElementShape()
 {
 	QDomElement elem = mShapeEdit->getPictureElement();
-	QFile file("D://blabl.txt");
-		QTextStream stream(&file);
-		file.open(QIODevice::ReadWrite);
-		//elem.save(stream, 0);
-		elem.save(stream, 0);
-		file.close();
 	int i = mMetamodelChangeManager->changeExistedElement(elem);
 	setActiveEditor(i);
 }

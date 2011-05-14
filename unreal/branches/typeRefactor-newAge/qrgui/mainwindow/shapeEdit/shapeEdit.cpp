@@ -227,6 +227,7 @@ void ShapeEdit::save()
 {
 	generateDom();
 	QMessageBox::information(this, tr("Saving"), "Saved successfully");
+	emit saveElementSignal();
 	emit shapeSaved(mDocument.toString(4), mIndex, mRole);
 }
 
