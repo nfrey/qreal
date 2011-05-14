@@ -157,10 +157,12 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 
 	Q_ASSERT(child->type().typeSize() == 3); // it should be element type
 
-	if (mEditorManager->getQuickMetamodelingPlugin()->id() == child->type().editor())
+	mMetaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
+	if (mMetaPlugin->id() == child->type().editor())
 	{
 		if (event->button() == Qt::RightButton)
 		{
+			mMetamodelChangeManager = new MetamodelChangeManager(child->type(), mEditorManager);
 			QMenu *menu = new QMenu(atMouse);
 			QAction *newElementAction = menu->addAction("Create new element");
 			QAction *copyElementAction = menu->addAction("Create element copy");
@@ -174,35 +176,37 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 	}
 	// new element's ID is being generated here
 	// may this epic event should take place in some more appropriate place
+	if (event->button() != Qt::RightButton)
+	{
+		Id elementId(QUuid::createUuid().toString());
+		NewType elementType = child->type();
+		QByteArray itemData;
+		bool isFromLogicalModel = false;
 
-	Id elementId(QUuid::createUuid().toString());
-	NewType elementType = child->type();
-	QByteArray itemData;
-	bool isFromLogicalModel = false;
+		QDataStream stream(&itemData, QIODevice::WriteOnly);
+		stream << elementId.toString();  // uuid
+		stream << elementType.toString(); //type
+		stream << ROOT_ID.toString();  // pathToItem
+		stream << QString("(" + child->text() + ")");
+		stream << QPointF(0, 0);
+		stream << isFromLogicalModel;
 
-	QDataStream stream(&itemData, QIODevice::WriteOnly);
-	stream << elementId.toString();  // uuid
-	stream << elementType.toString(); //type
-	stream << ROOT_ID.toString();  // pathToItem
-	stream << QString("(" + child->text() + ")");
-	stream << QPointF(0, 0);
-	stream << isFromLogicalModel;
+		QMimeData *mimeData = new QMimeData;
+		mimeData->setData("application/x-real-uml-data", itemData);
 
-	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("application/x-real-uml-data", itemData);
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
 
-	QDrag *drag = new QDrag(this);
-	drag->setMimeData(mimeData);
+		QPixmap p = child->icon().pixmap(96, 96);
 
-	QPixmap p = child->icon().pixmap(96, 96);
+		if (!p.isNull())
+			drag->setPixmap(child->icon().pixmap(96, 96));
 
-	if (!p.isNull())
-		drag->setPixmap(child->icon().pixmap(96, 96));
-
-	if (drag->start(Qt::CopyAction | Qt::MoveAction) == Qt::MoveAction)
-		child->close();
-	else
-		child->show();
+		if (drag->start(Qt::CopyAction | Qt::MoveAction) == Qt::MoveAction)
+			child->close();
+		else
+			child->show();
+	}
 }
 
 void PaletteToolbox::openCreateNewElementDialog()
@@ -215,44 +219,14 @@ void PaletteToolbox::openCreateNewElementDialog()
 void PaletteToolbox::createNewElement()
 {
 	mDialog->close();
-	createElement(mDialog->getElementName());//, mDialog->getElementDisplayedName());
+	ItemForAdd* item = mMetamodelChangeManager->createNewElement(mDialog->getElementName());
+	this->addItemType(item->getType(), item->getName(), item->getDescription(), item->getIcon());
+	setActiveEditor(item->getIndex());
 }
 
 void PaletteToolbox::createElementCopy()
 {
-	createElement(mChildElementType.element() + "Copy");
+	ItemForAdd* item = mMetamodelChangeManager->createCopyElement();
+	this->addItemType(item->getType(), item->getName(), item->getDescription(), item->getIcon());
+	setActiveEditor(item->getIndex());
 }
-
-void PaletteToolbox::createElement(const QString &elementName)//, ElementImpl *impl)
-{
-
-	QString normalizedName = NameNormalizer::normalize(elementName);
-	MetaPlugin * metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
-	ElementImpl* impl = metaPlugin->getGraphicalObject(mChildElementType.diagram(), mChildElementType.element());
-	QDomElement elemForIcon = metaPlugin->getDomElementForIcon(mChildElementType.diagram(), mChildElementType.element());
-	metaPlugin->addElement(mChildElementType.diagram(), elementName, elementName, impl, elemForIcon);
-	foreach (NewType const editor, mEditorManager->editors())
-	{
-		if (editor.editor() == metaPlugin->id())
-		{
-			foreach (NewType const diagram, mEditorManager->diagrams(editor))
-			{
-				foreach (NewType const element, mEditorManager->elements(diagram))
-				{
-					if (element.element() == normalizedName)
-						this->addItemType(element, mEditorManager->friendlyName(element), mEditorManager->description(element), mEditorManager->icon(element));
-				}
-			}
-
-		}
-	}
-	connect(mComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setActiveEditor(int)));
-	int i = 0;
-	for (i = 0; i < mEditorManager->editors().count(); i++)
-	{
-		if (mEditorManager->editors().at(i).editor() == metaPlugin->id())
-			break;
-	}
-	setActiveEditor(i);
-}
-

@@ -9,7 +9,11 @@
 #include "../editorManager/editorManager.h"
 #include "../../qrxc/nameNormalizer.h"
 #include "../dialogs/createNewElementDialog.h"
+#include "../umllib/elementTitle.h"
+#include "../editorManager/metamodelChangeManager.h"
 
+
+using namespace UML;
 class QVBoxLayout;
 class QComboBox;
 class QScrollArea;
@@ -39,15 +43,15 @@ public:
 private:
 	EditorManager *mEditorManager;
 	NewType mChildElementType;
-	void createElement(QString const &elementName);//, ElementImpl* impl);
 	CreateNewElementDialog* mDialog;
+	MetaPlugin* mMetaPlugin;
+	MetamodelChangeManager* mMetamodelChangeManager;
 
 public slots:
 	void setActiveEditor(int const editorIndex);
 	void openCreateNewElementDialog();
 	void createElementCopy();
 	void createNewElement();
-
 private:
 	class DraggableElement : public QWidget {
 	public:
