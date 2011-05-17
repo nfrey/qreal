@@ -11,6 +11,7 @@
 #include "editorview.h"
 #include "mainwindow.h"
 #include "../mainwindow/mainwindow.h"
+#include "../dialogs/changePropertyListDialog.h"
 
 using namespace qReal;
 
@@ -402,6 +403,18 @@ void EditorViewScene::createTypeChangeMenu(UML::Element const * const element,
 	}
 }
 
+void EditorViewScene::openPropertyChangeDialog()
+{
+	QMap<QString, QString> propertyMap;
+	QStringList properties = mWindow->manager()->getPropertyNames(mCurrentElement->newType());
+	foreach(QString name, properties)
+	{
+		propertyMap.insert(name, mWindow->manager()->getDefaultPropertyValue(mCurrentElement->newType(), name));
+	}
+	ChangePropertyListDialog* dialog = new ChangePropertyListDialog(mWindow, propertyMap);
+	dialog->show();
+}
+
 void EditorViewScene::createConnectionSubmenus(QMenu &contextMenu, UML::Element const * const element) const
 {
 	// menu items "connect to"
@@ -497,7 +510,9 @@ void EditorViewScene::initContextMenu(UML::Element *e, const QPointF &pos)
 		mActionSignalMapper->setMapping(action, action->text() + "###" + e->id().toString());
 	}
 	menu.addSeparator();
-
+	mCurrentElement = e;
+	QAction *openPropertyListDialog = menu.addAction("Change properties");
+	connect(openPropertyListDialog, SIGNAL(triggered()), SLOT(openPropertyChangeDialog()));
 	createConnectionSubmenus(menu, e);
 
 	menu.exec(QCursor::pos());

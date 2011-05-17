@@ -122,6 +122,7 @@ private:
 	MouseMovementManager * mouseMovementManager;
 
 	QSignalMapper *mActionSignalMapper;
+	UML::Element* mCurrentElement;
 
 	friend class qReal::EditorViewMViface;
 
@@ -141,4 +142,5 @@ private slots:
 	void drawIdealGesture();
 	void initMouseMoveManager();
 	void createEdge(QString const &);
+	void openPropertyChangeDialog();
 };
