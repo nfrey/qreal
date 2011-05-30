@@ -153,3 +153,9 @@ QDomElement MetamodelChangeManager::createGraphicalObjectForNewElement()
 
 	return graphicTag;
 }
+
+void MetamodelChangeManager::addNewProperty(const QString &element, const QString &property, const QString &defaultValue)
+{
+	QString diagName = mMetaPlugin->diagrams().first();
+	mMetaPlugin->addProperty(diagName, element, property, defaultValue);
+}

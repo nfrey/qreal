@@ -35,6 +35,7 @@ public:
 	ItemForAdd* createNewElement(QString const &elementName);
 	ItemForAdd* createCopyElement();
 	int changeExistedElement(QDomElement const &element);
+	void addNewProperty(QString const &element, QString const &property, QString const &defaultValue);
 private:
 	ItemForAdd* createElement(QString const &elementName, ElementImpl* impl, QDomElement elementForIcon);
 	QDomElement createGraphicalObjectForNewElement();

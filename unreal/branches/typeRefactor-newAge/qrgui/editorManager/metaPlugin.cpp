@@ -170,6 +170,23 @@ void MetaPlugin::changeElement(const QString &diagramName, const QString &elemen
 	mIconMap[diagramName][normalizedName] = elementForIcon;
 }
 
+void MetaPlugin::addProperty(const QString &diagramName, const QString &element, const QString &property, const QString &defaultValue)
+{
+	QString normalizedName = NameNormalizer::normalize(getQualifiedName(diagramName, element));
+	if (mPropertiesDescriptionMap[diagramName].contains(normalizedName))
+	{
+		mPropertiesDescriptionMap[diagramName][normalizedName].insert(property, defaultValue);
+		mPropertyDefault[normalizedName].insert(property, defaultValue);
+	}
+	else
+	{
+		QMap<QString, QString> map;
+		map.insert(property, defaultValue);
+		mPropertiesDescriptionMap[diagramName].insert(normalizedName, map);
+		mPropertyDefault.insert(normalizedName, map);
+	}
+}
+
 QString MetaPlugin::getQualifiedName(QString const &context, QString const &name) const
 {
 	return context + "::" + name;

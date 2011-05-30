@@ -6,6 +6,11 @@ CreateNewElementDialog::CreateNewElementDialog(QWidget *parent)
 	ui.setupUi(this);
 
 }
+void CreateNewElementDialog::setLabelsName(QString firstLabel, QString secondLable)
+{
+	ui.label->setText(firstLabel);
+	ui.label_2->setText(secondLable);
+}
 
 QString CreateNewElementDialog::getElementName() const
 {

@@ -58,6 +58,7 @@ public:
 
 	void addElement(QString const &diagramName, QString const &element, QString const &elementDisplayName, ElementImpl* impl, QDomElement elementForIcon);
 	void changeElement(QString const &diagramName, QString const &element, QString const &elementDisplayName, ElementImpl* impl, QDomElement elementForIcon);
+	void addProperty(QString const &diagramName, QString const &element, QString const &property, QString const &defaultValue);
 private:
 	QString const &mFileName;
 	QMap<QString, QIcon> iconMap;

@@ -8,7 +8,6 @@
 
 #include "paletteToolbox.h"
 #include "../kernel/definitions.h"
-#include "../dialogs/changePropertyListDialog.h"
 
 using namespace qReal;
 using namespace qReal::gui;
@@ -191,7 +190,7 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
 			connect(changeElementShape, SIGNAL(triggered()), SLOT(openShapeEditor()));
-			connect(changePropertyList, SIGNAL(triggered()), SLOT(changePropertyList()));
+			connect(changePropertyList, SIGNAL(triggered()), SLOT(openChangePropertyDialog()));
 
 			QPoint cursorPos = QCursor::pos();
 			menu->exec(cursorPos);
@@ -245,7 +244,7 @@ void PaletteToolbox::openShapeEditor()
 	mShapeEdit->open(doc);
 }
 
-void PaletteToolbox::changePropertyList()
+void PaletteToolbox::openChangePropertyDialog()
 {
 	QMap<QString, QString> propertyMap;
 	QStringList properties = mMetaPlugin->getPropertyNames(mChildElementType.diagram(), mChildElementType.element());
@@ -253,8 +252,19 @@ void PaletteToolbox::changePropertyList()
 	{
 		propertyMap.insert(name, mMetaPlugin->getPropertyDefaultValue(mChildElementType.element(), name));
 	}
-	ChangePropertyListDialog* dialog = new ChangePropertyListDialog(this->parentWidget(), propertyMap);
-	dialog->show();
+	mPropertyDialog = new ChangePropertyListDialog(this->parentWidget(), propertyMap);
+	mPropertyDialog->show();
+	connect(mPropertyDialog, SIGNAL(accepted()), SLOT(changePropertyList()));
+}
+
+void PaletteToolbox::changePropertyList()
+{
+	QMap<QString, QString> map = mPropertyDialog->getPropertyNamesWithDefaultValue();
+	foreach(QString prop, map.keys())
+	{
+		mMetamodelChangeManager->addNewProperty(mChildElementType.element(),
+												prop, map[prop]);
+	}
 }
 
 void PaletteToolbox::changeElementShape()

@@ -8,7 +8,7 @@
 #include "../editorManager/metaPlugin.h"
 #include "../editorManager/editorManager.h"
 #include "../../qrxc/nameNormalizer.h"
-#include "../dialogs/createNewElementDialog.h"
+#include "../dialogs/changePropertyListDialog.h"
 #include "../umllib/elementTitle.h"
 #include "../editorManager/metamodelChangeManager.h"
 #include "shapeEdit.h"
@@ -49,6 +49,9 @@ private:
 	MetaPlugin* mMetaPlugin;
 	MetamodelChangeManager* mMetamodelChangeManager;
 	ShapeEdit* mShapeEdit;
+	QString propertyName;
+	ChangePropertyListDialog* mPropertyDialog;
+
 
 public slots:
 	void setActiveEditor(int const editorIndex);
@@ -57,6 +60,7 @@ public slots:
 	void createNewElement();
 	void openShapeEditor();
 	void changeElementShape();
+	void openChangePropertyDialog();
 	void changePropertyList();
 private:
 	class DraggableElement : public QWidget {

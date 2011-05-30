@@ -19,14 +19,35 @@ ChangePropertyListDialog::ChangePropertyListDialog(QWidget *parent, QMap<QString
 		ui.propertyTable->setItem(i, 0, nameItem);
 		ui.propertyTable->setItem(i, 1, valueItem);
 	}
-	connect(ui.addPropertyButton, SIGNAL(pressed()), SLOT(AddNewProperty()));
+	connect(ui.addPropertyButton, SIGNAL(pressed()), SLOT(OpenNewElementDialog()));
+	connect(ui.saveButton, SIGNAL(pressed()), SLOT(accept()));
+}
+
+void ChangePropertyListDialog::OpenNewElementDialog()
+{
+	mDialog = new CreateNewElementDialog(this);
+	//mDialog->setLabelsName("property name", "default value");
+	connect(mDialog, SIGNAL(accepted()), SLOT(AddNewProperty()));
+	mDialog->show();
 }
 
 void ChangePropertyListDialog::AddNewProperty()
 {
-	ui.propertyTable->setRowCount(1);
-	QTableWidgetItem *nameItem = new QTableWidgetItem("Catch distance");
-	QTableWidgetItem *valueItem = new QTableWidgetItem("20");
-	ui.propertyTable->setItem(0, 0, nameItem);
-	ui.propertyTable->setItem(0, 1, valueItem);
+
+	ui.propertyTable->setRowCount(ui.propertyTable->rowCount() + 1);
+	QTableWidgetItem *nameItem = new QTableWidgetItem(mDialog->getElementName());
+	QTableWidgetItem *valueItem = new QTableWidgetItem(mDialog->getElementDisplayedName());
+	ui.propertyTable->setItem(ui.propertyTable->rowCount()-1, 0, nameItem);
+	ui.propertyTable->setItem(ui.propertyTable->rowCount()-1, 1, valueItem);
 }
+
+QMap<QString, QString> ChangePropertyListDialog::getPropertyNamesWithDefaultValue()
+{
+	QMap<QString, QString> res;
+	for (int i = 0; i < ui.propertyTable->rowCount(); i++)
+	{
+		res.insert(ui.propertyTable->item(i,0)->text(), ui.propertyTable->item(i,1)->text());
+	}
+	return res;
+}
+
