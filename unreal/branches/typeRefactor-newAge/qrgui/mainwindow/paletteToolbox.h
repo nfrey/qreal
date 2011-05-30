@@ -55,9 +55,11 @@ private:
 
 public slots:
 	void setActiveEditor(int const editorIndex);
+	void openCreateNewElementDialogForNode();
 	void openCreateNewElementDialog();
 	void createElementCopy();
 	void createNewElement();
+	void createNewConnection();
 	void openShapeEditor();
 	void changeElementShape();
 	void openChangePropertyDialog();

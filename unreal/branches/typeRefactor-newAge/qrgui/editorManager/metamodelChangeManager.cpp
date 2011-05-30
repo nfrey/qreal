@@ -49,13 +49,26 @@ ItemForAdd* MetamodelChangeManager::createCopyElement()
 	return createElement(mChildElementType.element() + "Copy", impl, elemForIcon);
 }
 
-ItemForAdd* MetamodelChangeManager::createNewElement(QString const &elementName)
+ItemForAdd* MetamodelChangeManager::createNewElement(QString const &elementName, bool isNode)
 {
-	QDomElement graphicTag = this->createGraphicalObjectForNewElement();
-	MetaElementImpl* impl = new MetaElementImpl(graphicTag,
-												true, true, false, 0, 0, true,
-												true, true, false, false,
-												QStringList(), "", "");
+	QDomElement graphicTag;
+	MetaElementImpl* impl;
+	if (!isNode)
+	{
+		graphicTag = this->createGraphicalObjectForNewConnection();
+		impl = new MetaElementImpl(graphicTag,
+								   false, false, false, 0, 0, false,
+								   false, false, false, false,
+								   QStringList(), "filled_arrow", "filled_arrow");
+	}
+	else
+	{
+		graphicTag = this->createGraphicalObjectForNewElement();
+		impl = new MetaElementImpl(graphicTag,
+								   true, true, false, 0, 0, true,
+								   true, true, false, false,
+								   QStringList(), "", "");
+	}
 	SdfRenderer* portRenderer = new SdfRenderer();
 	SdfRenderer* renderer = new SdfRenderer();
 	ElementTitleFactory factory;
@@ -150,6 +163,18 @@ QDomElement MetamodelChangeManager::createGraphicalObjectForNewElement()
 	rectangleTag.setAttribute("stroke-width", 1);
 	pictureTag.appendChild(rectangleTag);
 	graphicTag.appendChild(pictureTag);
+
+	return graphicTag;
+}
+
+QDomElement MetamodelChangeManager::createGraphicalObjectForNewConnection()
+{
+	QDomDocument doc;
+	QDomElement graphicTag = doc.createElement("graphics");
+	QDomElement lineTag = doc.createElement("lineType");
+
+	lineTag.setAttribute("type", "solidLine");
+	graphicTag.appendChild(lineTag);
 
 	return graphicTag;
 }

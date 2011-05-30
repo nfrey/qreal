@@ -182,12 +182,13 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			mMetamodelChangeManager = new MetamodelChangeManager(child->type(), mEditorManager);
 			QMenu *menu = new QMenu(atMouse);
 			QAction *newElementAction = menu->addAction("Create new element");
+			QAction *newConnectionAction = menu->addAction("Create new connection");
 			QAction *copyElementAction = menu->addAction("Create element copy");
 			QAction *changeElementShape = menu->addAction("Change element shape");
 			QAction *changePropertyList = menu->addAction("Change property list");
-			QAction *changeName = menu->addAction("Change element name");
 			mChildElementType = child->type();
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
+			connect(newConnectionAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
 			connect(changeElementShape, SIGNAL(triggered()), SLOT(openShapeEditor()));
 			connect(changePropertyList, SIGNAL(triggered()), SLOT(openChangePropertyDialog()));
@@ -274,17 +275,32 @@ void PaletteToolbox::changeElementShape()
 	setActiveEditor(i);
 }
 
-void PaletteToolbox::openCreateNewElementDialog()
+void PaletteToolbox::openCreateNewElementDialogForNode()
 {
 	mDialog = new CreateNewElementDialog(this->parentWidget());
 	mDialog->show();
 	connect(mDialog, SIGNAL(accepted()), SLOT(createNewElement()));
 }
 
+void PaletteToolbox::openCreateNewElementDialog()
+{
+	mDialog = new CreateNewElementDialog(this->parentWidget());
+	mDialog->show();
+	connect(mDialog, SIGNAL(accepted()), SLOT(createNewConnection()));
+}
+
 void PaletteToolbox::createNewElement()
 {
 	mDialog->close();
-	ItemForAdd* item = mMetamodelChangeManager->createNewElement(mDialog->getElementName());
+	ItemForAdd* item = mMetamodelChangeManager->createNewElement(mDialog->getElementName(), true);
+	this->addItemType(item->getType(), item->getName(), item->getDescription(), item->getIcon());
+	setActiveEditor(item->getIndex());
+}
+
+void PaletteToolbox::createNewConnection()
+{
+	mDialog->close();
+	ItemForAdd* item = mMetamodelChangeManager->createNewElement(mDialog->getElementName(), false);
 	this->addItemType(item->getType(), item->getName(), item->getDescription(), item->getIcon());
 	setActiveEditor(item->getIndex());
 }
