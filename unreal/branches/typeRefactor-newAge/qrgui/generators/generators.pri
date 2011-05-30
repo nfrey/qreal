@@ -1,7 +1,9 @@
 # XMI
 HEADERS += generators/xmi/xmiHandler.h \
+    generators/editorGenerator/metaEditorGenerator.h
 
 SOURCES += generators/xmi/xmiHandler.cpp \
+    generators/editorGenerator/metaEditorGenerator.cpp
 
 # JAVA
 HEADERS += generators/java/javaHandler.h \

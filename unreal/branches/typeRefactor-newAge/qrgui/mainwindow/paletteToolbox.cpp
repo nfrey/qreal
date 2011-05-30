@@ -154,7 +154,17 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 	if (!child)
 		child = dynamic_cast<DraggableElement *>(atMouse);
 	if (!child)
-		return;
+	{
+		if (event->button() == Qt::RightButton)
+		{
+			QMenu *menu = new QMenu(atMouse);
+			QAction *newElementAction = menu->addAction("Create new element");
+			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
+			QPoint cursorPos = QCursor::pos();
+			menu->exec(cursorPos);
+			return;
+		}
+	}
 
 	Q_ASSERT(child->type().typeSize() == 3); // it should be element type
 
@@ -168,6 +178,8 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			QAction *newElementAction = menu->addAction("Create new element");
 			QAction *copyElementAction = menu->addAction("Create element copy");
 			QAction *changeElementShape = menu->addAction("Change element shape");
+			QAction *changePropertyList = menu->addAction("Change property list");
+			QAction *changeName = menu->addAction("Change element name");
 			mChildElementType = child->type();
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));

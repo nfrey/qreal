@@ -8,4 +8,6 @@ public:
 	ChangePropertyListDialog(QWidget *parent = 0, QMap<QString,QString> propertyMap = QMap<QString, QString>());
 private:
 	Ui::ChangePropertyListDialog ui;
+private slots:
+	void AddNewProperty();
 };

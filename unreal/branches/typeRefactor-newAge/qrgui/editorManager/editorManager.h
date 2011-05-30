@@ -63,6 +63,7 @@ public:
 
 	bool isDiagramNode(NewType const &id) const;
 	EditorInterface* getQuickMetamodelingPlugin() const;
+	void loadQuickMetamodelingPlugin(QString const &filepath);
 private:
 	QStringList mPluginsLoaded;
 	QMap<QString, QString> mPluginFileName;

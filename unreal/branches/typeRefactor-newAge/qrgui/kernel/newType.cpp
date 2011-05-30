@@ -8,7 +8,7 @@ NewType NewType::loadFromString(QString const &string)
 {
 	QStringList path = string.split('/');
 	Q_ASSERT(path.count() > 0 && path.count() <= 5);
-	Q_ASSERT(path[0] == "qrm:");
+	//Q_ASSERT(path[0] == "qrm:");
 
 	NewType result;
 	switch (path.count()) {

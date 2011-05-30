@@ -33,6 +33,7 @@ void MetaModelParser::fillDiagramNameMap()
 	{
 		QDomElement diagram = diagrams.at(i).toElement();
 		mDiagramNameMap.insert(NameNormalizer::normalize(diagram.attribute("name")), diagram.attribute("displayedName"));
+		mDiagramNodeNameMap.insert(NameNormalizer::normalize(diagram.attribute("name")), diagram.attribute("nodeName"));
 		fillDiagramAttributes(diagram);
 	}
 }
@@ -348,6 +349,11 @@ QString MetaModelParser::getQualifiedName(QString const &context, QString const 
 QMap<QString, QString> MetaModelParser::getDiagramNameMap()
 {
 	return mDiagramNameMap;
+}
+
+QMap<QString, QString> MetaModelParser::getDiagramNodeNameMap()
+{
+	return mDiagramNodeNameMap;
 }
 
 QMap<QString, QMap<QString, QString> > MetaModelParser::getElementNameMap()

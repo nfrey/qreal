@@ -29,6 +29,7 @@ public:
 	void parseFile(QString const &fileName);
 	void loadIncludeList(QString const &fileName);
 	QMap<QString, QString> getDiagramNameMap();
+	QMap<QString, QString> getDiagramNodeNameMap();
 	QMap<QString, QMap<QString, QString> > getElementNameMap();
 	QMap<QString, QMap<QString, QString> > getElementDescriptionMap();
 	QMap<QString, QMap<QString, QString> > getPropertyTypes();
@@ -59,6 +60,7 @@ private:
 
 	QDomDocument mDocument;
 	QMap<QString, QString> mDiagramNameMap;
+	QMap<QString, QString> mDiagramNodeNameMap;
 	QMap<QString, QMap<QString, QString> > mElementsNameMap;
 	QMap<QString, QMap<QString, QString> > mElementsDescriptionMap;
 	QMap<QString, QMap<QString, QString> > mPropertyTypes;

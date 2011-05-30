@@ -40,6 +40,7 @@
 #include "../editorManager/listenerManager.h"
 #include "../generators/hascol/hascolGenerator.h"
 #include "../generators/editorGenerator/editorGenerator.h"
+#include "../generators/editorGenerator/metaEditorGenerator.h"
 #include "../visualDebugger/visualDebugger.h"
 
 #include "metaCompiler.h"
@@ -138,6 +139,7 @@ MainWindow::MainWindow()
 	connect(mUi->actionDebug_Single_step, SIGNAL(triggered()), this, SLOT(debugSingleStep()));
 
 	connect(mUi->actionClear, SIGNAL(triggered()), this, SLOT(exterminate()));
+	connect(mUi->save_metamodel, SIGNAL(triggered()), this, SLOT(saveMetaModel()));
 
 	adjustMinimapZoom(mUi->minimapZoomSlider->value());
 	initGridProperties();
@@ -1292,7 +1294,10 @@ void MainWindow::suggestToCreateDiagram()
 			i++;
 		}
 	}
-
+	mDiagramsList.append("Load meta editor");
+	mDiagramsList.append("Open new meta editor");
+	diagramsListWidget.addItem("Load meta editor");
+	diagramsListWidget.addItem("Open new meta editor");
 	QPushButton cancelButton;
 	cancelButton.setText("Cancel");
 	QPushButton okButton;
@@ -1335,9 +1340,39 @@ void MainWindow::diagramInCreateListDeselect()
 
 void MainWindow::diagramInCreateListSelected(int num)
 {
-	deleteFromExplorer(false);
-	deleteFromExplorer(true);
-	createDiagram(mDiagramsList.at(num));
+	QString diagramName = mDiagramsList.at(num);
+	if (diagramName == "Load meta plugin")
+	{
+
+	}
+	if (diagramName == "Open new meta editor")
+	{
+		QDir mPluginsDir = QDir(qApp->applicationDirPath());
+		mPluginsDir.cd("plugins");
+		mPluginsDir.cdUp();
+		mPluginsDir.cdUp();
+		mPluginsDir.cd("qrxml");
+		mPluginsDir.cd("testEditor");
+		QString xmlPath = mPluginsDir.absolutePath() + "/111.xml";
+		//	MetaPlugin* metaPlugin = new MetaPlugin(xmlPath);
+		//	metaPlugin->initPlugin();
+		//	mPluginsLoaded += metaPlugin->id();
+		//	mPluginFileName.insert(metaPlugin->id(), xmlPath);
+		//	mPluginIface[metaPlugin->id()] = metaPlugin;
+		mEditorManager.loadQuickMetamodelingPlugin(xmlPath);
+		MetaPlugin* metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager.getQuickMetamodelingPlugin());
+		QString diag = metaPlugin->diagrams().first();
+		QString str = "qrm:/" + metaPlugin->id() + "/" + diag + "/" + metaPlugin->diagramNodeName(diag);
+		deleteFromExplorer(false);
+		deleteFromExplorer(true);
+		createDiagram(str);
+	}
+	else
+	{
+		deleteFromExplorer(false);
+		deleteFromExplorer(true);
+		createDiagram(mDiagramsList.at(num));
+	}
 }
 
 void MainWindow::createDiagram(QString const &idString)
@@ -1348,6 +1383,7 @@ void MainWindow::createDiagram(QString const &idString)
 	Id const logicalIdCreated = mModels->graphicalModelAssistApi().logicalId(created);
 	QModelIndex const logicalIndex = mModels->logicalModelAssistApi().indexById(logicalIdCreated);
 	mUi->logicalModelExplorer->setCurrentIndex(logicalIndex);
+	loadPlugins();
 	openNewTab(index);
 }
 
@@ -1406,6 +1442,21 @@ void MainWindow::debugSingleStep()
 		gui::ErrorReporter &errorReporter = mVisualDebugger->debugSingleStep();
 		errorReporter.showErrors(mUi->errorListWidget, mUi->errorDock);
 		mVisualDebugger->clearErrorReporter();
+	}
+}
+
+void MainWindow::saveMetaModel()
+{
+	QString filename = QFileDialog::getSaveFileName(
+				this,
+				tr("Save Document"),
+				QDir::currentPath(),
+				tr("Document files *.xml"));
+	if( !filename.isEmpty() )
+	{
+		generators::MetaEditorGenerator generator =
+				generators::MetaEditorGenerator(dynamic_cast<MetaPlugin *>(mEditorManager.getQuickMetamodelingPlugin()));
+		generator.generateEditor(filename);
 	}
 }
 

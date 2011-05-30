@@ -19,4 +19,14 @@ ChangePropertyListDialog::ChangePropertyListDialog(QWidget *parent, QMap<QString
 		ui.propertyTable->setItem(i, 0, nameItem);
 		ui.propertyTable->setItem(i, 1, valueItem);
 	}
+	connect(ui.addPropertyButton, SIGNAL(pressed()), SLOT(AddNewProperty()));
+}
+
+void ChangePropertyListDialog::AddNewProperty()
+{
+	ui.propertyTable->setRowCount(1);
+	QTableWidgetItem *nameItem = new QTableWidgetItem("Catch distance");
+	QTableWidgetItem *valueItem = new QTableWidgetItem("20");
+	ui.propertyTable->setItem(0, 0, nameItem);
+	ui.propertyTable->setItem(0, 1, valueItem);
 }

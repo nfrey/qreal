@@ -53,7 +53,6 @@ QWidget *PropertyEditorDelegate::createEditor(QWidget *parent,
 		return button;
 	}
 	QLineEdit *editor = new QLineEdit(parent);
-
 	return editor;
 }
 

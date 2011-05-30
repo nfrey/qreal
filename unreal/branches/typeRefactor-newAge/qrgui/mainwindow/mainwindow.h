@@ -89,6 +89,7 @@ public slots:
 
 	void debug();
 	void debugSingleStep();
+	void saveMetaModel();
 
 private slots:
 	void deleteFromDiagram();
@@ -123,7 +124,7 @@ private slots:
 
 private:
 	Ui::MainWindowUi *mUi;
-
+	QString mWorkDir;
 	QCloseEvent *mCloseEvent;
 	models::Models *mModels;
 	EditorManager mEditorManager;

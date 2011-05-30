@@ -11,6 +11,7 @@ void MetaPlugin::initPlugin()
 	parser.parseFile(mFileName);
 	mElementsNameMap = parser.getElementNameMap();
 	mDiagramNameMap = parser.getDiagramNameMap();
+	mDiagramNodeNameMap = parser.getDiagramNodeNameMap();
 	mElementsDescriptionMap = parser.getElementDescriptionMap();
 	mPropertyDefault = parser.getPropertyDefaultValues();
 	mPropertyTypes = parser.getPropertyTypes();
