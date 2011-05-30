@@ -8,6 +8,7 @@
 
 #include "paletteToolbox.h"
 #include "../kernel/definitions.h"
+#include "../dialogs/changePropertyListDialog.h"
 
 using namespace qReal;
 using namespace qReal::gui;
@@ -76,6 +77,11 @@ void PaletteToolbox::setActiveEditor(int const comboIndex)
 		mScrollArea->takeWidget(); // Save current editor from extermination.
 		mScrollArea->setWidget(mTabs[comboIndex]);
 	}
+}
+
+bool PaletteToolbox::containsDiagramType(const QString &name)
+{
+	return mTabNames.contains(name);
 }
 
 void PaletteToolbox::addDiagramType(NewType const &type, QString const &name)
@@ -157,6 +163,7 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 	{
 		if (event->button() == Qt::RightButton)
 		{
+			mMetamodelChangeManager = new MetamodelChangeManager(mEditorManager);
 			QMenu *menu = new QMenu(atMouse);
 			QAction *newElementAction = menu->addAction("Create new element");
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
@@ -184,6 +191,7 @@ void PaletteToolbox::mousePressEvent(QMouseEvent *event)
 			connect(newElementAction, SIGNAL(triggered()), SLOT(openCreateNewElementDialog()));
 			connect(copyElementAction, SIGNAL(triggered()), SLOT(createElementCopy()));
 			connect(changeElementShape, SIGNAL(triggered()), SLOT(openShapeEditor()));
+			connect(changePropertyList, SIGNAL(triggered()), SLOT(changePropertyList()));
 
 			QPoint cursorPos = QCursor::pos();
 			menu->exec(cursorPos);
@@ -235,6 +243,18 @@ void PaletteToolbox::openShapeEditor()
 	graphicTag.appendChild(elem);
 	doc.appendChild(graphicTag);
 	mShapeEdit->open(doc);
+}
+
+void PaletteToolbox::changePropertyList()
+{
+	QMap<QString, QString> propertyMap;
+	QStringList properties = mMetaPlugin->getPropertyNames(mChildElementType.diagram(), mChildElementType.element());
+	foreach(QString name, properties)
+	{
+		propertyMap.insert(name, mMetaPlugin->getPropertyDefaultValue(mChildElementType.element(), name));
+	}
+	ChangePropertyListDialog* dialog = new ChangePropertyListDialog(this->parentWidget(), propertyMap);
+	dialog->show();
 }
 
 void PaletteToolbox::changeElementShape()

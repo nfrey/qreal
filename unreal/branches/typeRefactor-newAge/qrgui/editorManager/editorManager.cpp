@@ -43,16 +43,16 @@ EditorManager::EditorManager(QObject *parent)
 			// QMessageBox::warning(0, "QReal Plugin", loader->errorString() );
 		}
 	}
-//	mPluginsDir.cdUp();
-//	mPluginsDir.cdUp();
-//	mPluginsDir.cd("qrxml");
-//	mPluginsDir.cd("testEditor");
-//	QString xmlPath = mPluginsDir.absolutePath() + "/111.xml";
-//	MetaPlugin* metaPlugin = new MetaPlugin(xmlPath);
-//	metaPlugin->initPlugin();
-//	mPluginsLoaded += metaPlugin->id();
-//	mPluginFileName.insert(metaPlugin->id(), xmlPath);
-//	mPluginIface[metaPlugin->id()] = metaPlugin;
+	//	mPluginsDir.cdUp();
+	//	mPluginsDir.cdUp();
+	//	mPluginsDir.cd("qrxml");
+	//	mPluginsDir.cd("testEditor");
+	//	QString xmlPath = mPluginsDir.absolutePath() + "/111.xml";
+	//	MetaPlugin* metaPlugin = new MetaPlugin(xmlPath);
+	//	metaPlugin->initPlugin();
+	//	mPluginsLoaded += metaPlugin->id();
+	//	mPluginFileName.insert(metaPlugin->id(), xmlPath);
+	//	mPluginIface[metaPlugin->id()] = metaPlugin;
 }
 
 void EditorManager::loadQuickMetamodelingPlugin(QString const &xmlPath)

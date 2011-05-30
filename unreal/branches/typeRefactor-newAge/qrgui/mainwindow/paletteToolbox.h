@@ -34,6 +34,7 @@ public:
 	~PaletteToolbox();
 
 	void addDiagramType(NewType const &type, QString const &name);
+	bool containsDiagramType(QString const &name);
 	void addItemType(NewType const &type, QString const &name, QString const &description, QIcon const &icon);
 	void initDone();
 	void deleteDiagramType(NewType const &type);
@@ -56,6 +57,7 @@ public slots:
 	void createNewElement();
 	void openShapeEditor();
 	void changeElementShape();
+	void changePropertyList();
 private:
 	class DraggableElement : public QWidget {
 	public:

@@ -31,6 +31,7 @@ class MetamodelChangeManager : public QObject
 {
 public:
 	MetamodelChangeManager(NewType childElementType, EditorManager * editorManager);
+	MetamodelChangeManager(EditorManager * editorManager);
 	ItemForAdd* createNewElement(QString const &elementName);
 	ItemForAdd* createCopyElement();
 	int changeExistedElement(QDomElement const &element);
@@ -42,8 +43,5 @@ private:
 	NewType mChildElementType;
 	MetaPlugin* mMetaPlugin;
 	EditorManager * mEditorManager;
-
-
-
 };
 }

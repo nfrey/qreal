@@ -36,6 +36,12 @@ MetamodelChangeManager::MetamodelChangeManager(NewType childElementType, EditorM
 	mMetaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
 }
 
+MetamodelChangeManager::MetamodelChangeManager(EditorManager * editorManager)
+	:mEditorManager(editorManager)
+{
+	mMetaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager->getQuickMetamodelingPlugin());
+}
+
 ItemForAdd* MetamodelChangeManager::createCopyElement()
 {
 	ElementImpl* impl = mMetaPlugin->getGraphicalObject(mChildElementType.diagram(), mChildElementType.element());
@@ -95,7 +101,8 @@ ItemForAdd* MetamodelChangeManager::createElement(const QString &elementName, El
 {
 	ItemForAdd* item;
 	QString normalizedName = NameNormalizer::normalize(elementName);
-	mMetaPlugin->addElement(mChildElementType.diagram(), elementName, elementName, impl, elementForIcon);
+	QString diagName = mMetaPlugin->diagrams().first();
+	mMetaPlugin->addElement(diagName, elementName, elementName, impl, elementForIcon);
 
 	int i = 0;
 	for (i = 0; i < mEditorManager->editors().count(); i++)

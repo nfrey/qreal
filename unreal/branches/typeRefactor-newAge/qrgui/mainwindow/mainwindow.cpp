@@ -276,6 +276,8 @@ void MainWindow::loadPlugins()
 {
 	foreach (NewType const editor, mEditorManager.editors()) {
 		foreach (NewType const diagram, mEditorManager.diagrams(editor)) {
+			if (mUi->paletteToolbox->containsDiagramType(mEditorManager.friendlyName(diagram)))
+				continue;
 			mUi->paletteToolbox->addDiagramType(diagram, mEditorManager.friendlyName(diagram) );
 
 			foreach (NewType const element, mEditorManager.elements(diagram)) {
@@ -1341,10 +1343,7 @@ void MainWindow::diagramInCreateListDeselect()
 void MainWindow::diagramInCreateListSelected(int num)
 {
 	QString diagramName = mDiagramsList.at(num);
-	if (diagramName == "Load meta plugin")
-	{
-
-	}
+	QString fileName;
 	if (diagramName == "Open new meta editor")
 	{
 		QDir mPluginsDir = QDir(qApp->applicationDirPath());
@@ -1352,27 +1351,29 @@ void MainWindow::diagramInCreateListSelected(int num)
 		mPluginsDir.cdUp();
 		mPluginsDir.cdUp();
 		mPluginsDir.cd("qrxml");
-		mPluginsDir.cd("testEditor");
-		QString xmlPath = mPluginsDir.absolutePath() + "/111.xml";
-		//	MetaPlugin* metaPlugin = new MetaPlugin(xmlPath);
-		//	metaPlugin->initPlugin();
-		//	mPluginsLoaded += metaPlugin->id();
-		//	mPluginFileName.insert(metaPlugin->id(), xmlPath);
-		//	mPluginIface[metaPlugin->id()] = metaPlugin;
-		mEditorManager.loadQuickMetamodelingPlugin(xmlPath);
+		mPluginsDir.cd("newMetaEditor");
+		fileName = mPluginsDir.absolutePath() + "/111.xml";
+	}
+	if (diagramName == "Load meta editor")
+	{
+		QString filename = QFileDialog::getOpenFileName(
+					this,
+					tr("Open metamodel"),
+					QDir::currentPath(),
+					tr("Document files *.xml"));
+		fileName = filename;
+	}
+	if (!fileName.isEmpty())
+	{
+		mEditorManager.loadQuickMetamodelingPlugin(fileName);
 		MetaPlugin* metaPlugin = dynamic_cast<MetaPlugin *>(mEditorManager.getQuickMetamodelingPlugin());
 		QString diag = metaPlugin->diagrams().first();
-		QString str = "qrm:/" + metaPlugin->id() + "/" + diag + "/" + metaPlugin->diagramNodeName(diag);
-		deleteFromExplorer(false);
-		deleteFromExplorer(true);
-		createDiagram(str);
+		diagramName = "qrm:/" + metaPlugin->id() + "/" + diag + "/" + metaPlugin->diagramNodeName(diag);
 	}
-	else
-	{
-		deleteFromExplorer(false);
-		deleteFromExplorer(true);
-		createDiagram(mDiagramsList.at(num));
-	}
+	deleteFromExplorer(false);
+	deleteFromExplorer(true);
+	createDiagram(diagramName);
+
 }
 
 void MainWindow::createDiagram(QString const &idString)
